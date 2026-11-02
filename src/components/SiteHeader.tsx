@@ -1,0 +1,46 @@
+import { Ticket } from 'lucide-react';
+import type { Route } from '@/hooks/useRoute';
+
+interface SiteHeaderProps {
+  activeRoute: Route['name'];
+}
+
+const NAV_ITEMS: { label: string; href: string; route: Route['name'] }[] = [
+  { label: 'Events', href: '#/', route: 'home' },
+  { label: 'Find my booking', href: '#/bookings', route: 'bookings' },
+];
+
+export default function SiteHeader({ activeRoute }: SiteHeaderProps) {
+  return (
+    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-paper/90 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="#/" className="group flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink text-white transition group-hover:bg-brand-800">
+            <Ticket className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span className="font-display text-xl font-bold tracking-tight text-slate-900">Stagepass</span>
+        </a>
+
+        <nav className="flex items-center gap-1 sm:gap-2" aria-label="Main">
+          {NAV_ITEMS.map((item) => {
+            const isActive = item.route === activeRoute;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? 'page' : undefined}
+                className={`rounded-full px-3 py-2 text-sm transition sm:px-4 ${
+                  isActive
+                    ? 'bg-ink font-medium text-white'
+                    : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+                }`}
+              >
+                {item.label}
+              </a>
+            );
+          })}
+        </nav>
+      </div>
+    </header>
+  );
+}
