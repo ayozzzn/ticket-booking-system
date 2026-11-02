@@ -34,15 +34,15 @@ export default function BookingLookupPage() {
 
   return (
     <div className="mx-auto max-w-xl px-4 py-16 sm:px-6 lg:px-8">
-      <p className="text-sm font-medium text-brand-800">Your tickets</p>
-      <h1 className="mt-3 font-display text-4xl font-bold leading-tight tracking-tight text-slate-900">Find my booking</h1>
-      <p className="mt-3 text-slate-600">
+      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-800">Your tickets</p>
+      <h1 className="mt-3 font-display text-4xl leading-tight text-stone-900">Find my booking</h1>
+      <p className="mt-3 text-stone-600">
         Enter the booking code from your confirmation and the email you booked with.
       </p>
 
       <form
         onSubmit={handleSubmit}
-        className="mt-10 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8"
+        className="mt-10 space-y-5 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8"
       >
         <FormField
           id="lookup-code"
@@ -67,7 +67,7 @@ export default function BookingLookupPage() {
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-slate-900 py-3.5 font-semibold text-white transition hover:bg-slate-700 disabled:cursor-wait disabled:opacity-70"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-stone-900 py-3.5 font-semibold text-white transition hover:bg-stone-700 disabled:cursor-wait disabled:opacity-70"
         >
           {status === 'loading' ? (
             <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -94,7 +94,7 @@ export default function BookingLookupPage() {
           </div>
         )}
         {status === 'found' && receipt && (
-          <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+          <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8">
             <BookingReceiptCard receipt={receipt} />
           </div>
         )}

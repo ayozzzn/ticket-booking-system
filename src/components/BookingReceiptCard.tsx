@@ -28,26 +28,26 @@ export default function BookingReceiptCard({ receipt }: BookingReceiptCardProps)
         <p className="text-sm font-medium">Your tickets are reserved. Keep your booking code for entry.</p>
       </div>
 
-      <div className="rounded-2xl border border-dashed border-brand-700/40 bg-brand-50/60 p-5 text-center">
-        <p className="flex items-center justify-center gap-2 text-sm font-medium text-brand-800">
+      <div className="rounded-2xl border border-dashed border-teal-700/40 bg-teal-50/60 p-5 text-center">
+        <p className="flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-teal-800">
           <Ticket className="h-4 w-4" aria-hidden="true" />
           Booking code
         </p>
-        <p className="mt-2 font-mono text-2xl font-semibold tracking-[0.3em] text-slate-900">
+        <p className="mt-2 font-mono text-2xl font-semibold tracking-[0.3em] text-stone-900">
           {receipt.booking_code}
         </p>
       </div>
 
-      <dl className="divide-y divide-slate-100 rounded-2xl ring-1 ring-slate-200">
+      <dl className="divide-y divide-stone-100 rounded-2xl ring-1 ring-stone-200">
         {details.map((item) => (
           <div key={item.label} className="flex items-start justify-between gap-6 px-4 py-3">
-            <dt className="shrink-0 text-sm text-slate-500">{item.label}</dt>
-            <dd className="text-right text-sm font-medium text-slate-900 break-words">{item.value}</dd>
+            <dt className="shrink-0 text-sm text-stone-500">{item.label}</dt>
+            <dd className="text-right text-sm font-medium text-stone-900 break-words">{item.value}</dd>
           </div>
         ))}
       </dl>
 
-      <p className="text-xs text-slate-500">Look up this booking anytime with your code and email.</p>
+      <p className="text-xs text-stone-500">Look up this booking anytime with your code and email.</p>
     </div>
   );
 }

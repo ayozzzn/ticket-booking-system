@@ -1,6 +1,4 @@
 /*
-# Create ticket booking system (events, ticket types, bookings)
-
 1. New Tables
 - `events`: public listings with title, description, category, venue, city, start time, and image.
 - `ticket_tiers`: ticket types per event with price (in cents), total capacity, and tickets sold.

@@ -39,33 +39,33 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
       <a
         href="#/"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        className="inline-flex items-center gap-2 text-sm font-medium text-stone-600 transition hover:text-stone-900"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />
         All events
       </a>
 
       {status === 'loading' && (
-        <div className="flex items-center justify-center gap-3 py-32 text-slate-500" role="status">
+        <div className="flex items-center justify-center gap-3 py-32 text-stone-500" role="status">
           <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
           Loading event...
         </div>
       )}
 
       {(status === 'error' || status === 'missing') && (
-        <div className="mx-auto mt-16 flex max-w-md flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center ring-1 ring-slate-200">
+        <div className="mx-auto mt-16 flex max-w-md flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center ring-1 ring-stone-200">
           <AlertCircle className="h-8 w-8 text-rose-700" aria-hidden="true" />
-          <p className="font-display text-2xl font-bold text-slate-900">
+          <p className="font-display text-2xl text-stone-900">
             {status === 'missing' ? 'We could not find that event' : 'Something went wrong'}
           </p>
-          <p className="text-slate-600">
+          <p className="text-stone-600">
             {status === 'missing' ? 'It may have been removed. Browse the other events instead.' : errorMessage}
           </p>
           {status === 'error' && (
             <button
               type="button"
               onClick={() => void load()}
-              className="rounded-full bg-slate-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-slate-700"
+              className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
             >
               Try again
             </button>
@@ -76,36 +76,36 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
       {status === 'ready' && event && (
         <>
           <div className="mt-8 grid gap-10 lg:grid-cols-2 lg:gap-14">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-slate-200">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-stone-200 shadow-lg shadow-stone-900/10">
               <EventImage src={event.image_url} alt={event.title} />
             </div>
 
             <div className="flex flex-col justify-center">
-              <span className="w-fit rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-900">
+              <span className="w-fit rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-900">
                 {event.category}
               </span>
-              <h1 className="mt-5 font-display text-4xl font-bold leading-[1.1] tracking-tight text-slate-900 sm:text-5xl">{event.title}</h1>
+              <h1 className="mt-5 font-display text-4xl leading-[1.15] text-stone-900 sm:text-5xl">{event.title}</h1>
 
-              <div className="mt-6 space-y-3 text-slate-700">
+              <div className="mt-6 space-y-3 text-stone-700">
                 <p className="flex items-center gap-3">
-                  <CalendarDays className="h-5 w-5 text-brand-800" aria-hidden="true" />
+                  <CalendarDays className="h-5 w-5 text-teal-800" aria-hidden="true" />
                   {formatEventDate(event.starts_at)} · {formatEventTime(event.starts_at)}
                 </p>
                 <p className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-brand-800" aria-hidden="true" />
+                  <MapPin className="h-5 w-5 text-teal-800" aria-hidden="true" />
                   {event.venue}, {event.city}
                 </p>
               </div>
 
-              <p className="mt-6 text-base leading-relaxed text-slate-600">{event.description}</p>
+              <p className="mt-6 text-base leading-relaxed text-stone-600">{event.description}</p>
             </div>
           </div>
 
           <section className="mt-16" aria-labelledby="tickets-heading">
-            <h2 id="tickets-heading" className="font-display text-3xl font-bold tracking-tight text-slate-900">
+            <h2 id="tickets-heading" className="font-display text-3xl text-stone-900">
               Choose your tickets
             </h2>
-            <p className="mt-2 text-slate-600">Select a ticket type to continue to checkout.</p>
+            <p className="mt-2 text-stone-600">Select a ticket type to continue to checkout.</p>
 
             <ul className="mt-8 grid gap-4">
               {event.ticket_tiers.map((tier) => {
@@ -115,11 +115,11 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                 return (
                   <li
                     key={tier.id}
-                    className="flex flex-col gap-4 rounded-xl bg-white p-5 ring-1 ring-slate-200 transition hover:ring-brand-600/50 sm:flex-row sm:items-center sm:justify-between sm:p-6"
+                    className="flex flex-col gap-4 rounded-2xl bg-white p-5 ring-1 ring-stone-200 transition hover:ring-teal-700/40 sm:flex-row sm:items-center sm:justify-between sm:p-6"
                   >
                     <div className="min-w-0">
-                      <h3 className="text-lg font-semibold text-slate-900">{tier.name}</h3>
-                      <p className="mt-1 text-sm text-slate-600">{tier.description}</p>
+                      <h3 className="text-lg font-semibold text-stone-900">{tier.name}</h3>
+                      <p className="mt-1 text-sm text-stone-600">{tier.description}</p>
                       <p
                         className={`mt-2 text-sm font-medium ${
                           soldOut ? 'text-rose-700' : low ? 'text-amber-800' : 'text-emerald-800'
@@ -130,12 +130,12 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                     </div>
 
                     <div className="flex items-center justify-between gap-6 sm:justify-end">
-                      <p className="font-display text-2xl font-bold text-slate-900">{formatPrice(tier.price_cents)}</p>
+                      <p className="font-display text-2xl text-stone-900">{formatPrice(tier.price_cents)}</p>
                       <button
                         type="button"
                         disabled={soldOut}
                         onClick={() => setSelectedTier(tier)}
-                        className="rounded-full bg-brand-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600 disabled:shadow-none"
+                        className="rounded-full bg-teal-800 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-teal-700 hover:shadow-md disabled:cursor-not-allowed disabled:bg-stone-300 disabled:text-stone-600 disabled:shadow-none disabled:hover:translate-y-0"
                       >
                         {soldOut ? 'Unavailable' : 'Select'}
                       </button>
