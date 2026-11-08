@@ -33,4 +33,6 @@ export interface BookingReceipt {
   event_city: string;
   event_starts_at: string;
   tier_name: string;
+  status: 'confirmed' | 'cancelled' | null;
+  cancelled_at: string | null;
 }

@@ -88,6 +88,24 @@ export async function fetchBooking(code: string, email: string): Promise<Booking
   return data;
 }
 
+export async function cancelBooking(code: string, email: string): Promise<BookingReceipt> {
+  const { data, error } = await supabase.rpc('cancel_booking', {
+    p_code: code,
+    p_email: email,
+  });
+
+  if (error) {
+    console.error('Cancellation failed', error);
+    throw new Error(error.message || 'We could not cancel your booking. Please try again.');
+  }
+
+  if (!isBookingReceipt(data)) {
+    throw new Error('Your booking was cancelled but the updated details could not be loaded.');
+  }
+
+  return data;
+}
+
 function isBookingReceipt(value: unknown): value is BookingReceipt {
   if (typeof value !== 'object' || value === null) return false;
   const v = value as Record<string, unknown>;
@@ -95,6 +113,8 @@ function isBookingReceipt(value: unknown): value is BookingReceipt {
     typeof v.booking_code === 'string' &&
     typeof v.event_title === 'string' &&
     typeof v.quantity === 'number' &&
-    typeof v.total_cents === 'number'
+    typeof v.total_cents === 'number' &&
+    (v.status === 'confirmed' || v.status === 'cancelled') &&
+    (v.cancelled_at === null || typeof v.cancelled_at === 'string')
   );
 }

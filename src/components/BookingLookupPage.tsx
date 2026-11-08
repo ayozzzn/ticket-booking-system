@@ -1,5 +1,6 @@
 import { AlertCircle, Loader2, Search } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
+import BookingActions from '@/components/BookingActions';
 import BookingReceiptCard from '@/components/BookingReceiptCard';
 import FormField from '@/components/FormField';
 import { fetchBooking } from '@/lib/bookingApi';
@@ -37,7 +38,7 @@ export default function BookingLookupPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-teal-800">Your tickets</p>
       <h1 className="mt-3 font-display text-4xl leading-tight text-stone-900">Find my booking</h1>
       <p className="mt-3 text-stone-600">
-        Enter the booking code from your confirmation and the email you booked with.
+        Enter the booking code from your confirmation and the email you booked with. You can also cancel here.
       </p>
 
       <form
@@ -82,9 +83,7 @@ export default function BookingLookupPage() {
         {status === 'notFound' && (
           <div className="flex items-start gap-3 rounded-2xl bg-amber-50 p-5 text-amber-900 ring-1 ring-amber-200">
             <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-            <p className="text-sm">
-              No booking matches that code and email. Check both and try again.
-            </p>
+            <p className="text-sm">No booking matches that code and email. Check both and try again.</p>
           </div>
         )}
         {status === 'error' && (
@@ -94,8 +93,9 @@ export default function BookingLookupPage() {
           </div>
         )}
         {status === 'found' && receipt && (
-          <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8">
+          <div className="animate-fade-up space-y-8 rounded-3xl bg-white p-6 shadow-sm ring-1 ring-stone-200 sm:p-8">
             <BookingReceiptCard receipt={receipt} />
+            <BookingActions receipt={receipt} onUpdated={setReceipt} />
           </div>
         )}
       </div>
