@@ -8,6 +8,7 @@ interface SiteHeaderProps {
 const NAV_ITEMS: { label: string; href: string; route: Route['name'] }[] = [
   { label: 'Events', href: '#/', route: 'home' },
   { label: 'Find my booking', href: '#/bookings', route: 'bookings' },
+  { label: 'Admin', href: '#/admin', route: 'admin' },
 ];
 
 export default function SiteHeader({ activeRoute }: SiteHeaderProps) {

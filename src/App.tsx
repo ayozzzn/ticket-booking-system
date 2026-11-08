@@ -3,6 +3,7 @@ import EventCatalog from '@/components/EventCatalog';
 import EventDetailPage from '@/components/EventDetailPage';
 import BookingLookupPage from '@/components/BookingLookupPage';
 import { useRoute } from '@/hooks/useRoute';
+import AdminPanel from '@/components/admin/AdminPanel';
 
 function App() {
   const route = useRoute();
@@ -15,6 +16,7 @@ function App() {
         {route.name === 'home' && <EventCatalog />}
         {route.name === 'event' && <EventDetailPage key={route.id} eventId={route.id} />}
         {route.name === 'bookings' && <BookingLookupPage />}
+        {route.name === 'admin' && <AdminPanel />}
       </main>
 
       <footer className="border-t border-stone-200 bg-white">
