@@ -9,6 +9,7 @@ const NAV_ITEMS: { label: string; href: string; route: Route['name'] }[] = [
   { label: 'Events', href: '#/', route: 'home' },
   { label: 'Find my booking', href: '#/bookings', route: 'bookings' },
   { label: 'Admin', href: '#/admin', route: 'admin' },
+  { label: 'Sign up', href: '#/register', route: 'register' },
 ];
 
 export default function SiteHeader({ activeRoute }: SiteHeaderProps) {

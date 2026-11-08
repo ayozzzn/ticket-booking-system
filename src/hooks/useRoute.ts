@@ -4,7 +4,8 @@ export type Route =
   | { name: 'home' }
   | { name: 'event'; id: string }
   | { name: 'bookings' }
-  | { name: 'admin' };
+  | { name: 'admin' }
+  | { name: 'register' };
 
 function parseRoute(hash: string): Route {
   const path = hash.replace(/^#/, '') || '/';
@@ -12,6 +13,7 @@ function parseRoute(hash: string): Route {
   if (eventMatch) return { name: 'event', id: eventMatch[1] };
   if (path === '/bookings') return { name: 'bookings' };
   if (path === '/admin') return { name: 'admin' };
+  if (path === '/register') return { name: 'register' };
   return { name: 'home' };
 }
 

@@ -2,6 +2,7 @@ import SiteHeader from '@/components/SiteHeader';
 import EventCatalog from '@/components/EventCatalog';
 import EventDetailPage from '@/components/EventDetailPage';
 import BookingLookupPage from '@/components/BookingLookupPage';
+import RegisterPage from '@/components/RegisterPage';
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
 
@@ -17,6 +18,7 @@ function App() {
         {route.name === 'event' && <EventDetailPage key={route.id} eventId={route.id} />}
         {route.name === 'bookings' && <BookingLookupPage />}
         {route.name === 'admin' && <AdminPanel />}
+        {route.name === 'register' && <RegisterPage />}
       </main>
 
       <footer className="border-t border-stone-200 bg-white">
