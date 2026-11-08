@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
-type Method = 'email' | 'phone';
-
 function getPasswordChecks(password: string) {
   return {
     length: password.length >= 8 && password.length <= 12,
@@ -13,8 +11,7 @@ function getPasswordChecks(password: string) {
 }
 
 export default function RegisterPage() {
-  const [method, setMethod] = useState<Method>('email');
-  const [contact, setContact] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -41,14 +38,16 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-    const { error } =
-      method === 'email'
-        ? await supabase.auth.signUp({ email: contact.trim(), password })
-        : await supabase.auth.signUp({ phone: contact.trim(), password });
+    const { data, error } = await supabase.auth.signUp({ email: email.trim(), password });
     setLoading(false);
 
     if (error) {
       setError(error.message);
+      return;
+    }
+
+    if (data.session) {
+      window.location.hash = '#/my-bookings';
       return;
     }
     setDone(true);
@@ -58,16 +57,12 @@ export default function RegisterPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center">
         <h1 className="font-display text-2xl text-stone-900">You are registered</h1>
-        <p className="mt-3 text-stone-600">
-          {method === 'email'
-            ? 'Check your email to confirm your account.'
-            : 'Check your phone for the confirmation code.'}
-        </p>
+        <p className="mt-3 text-stone-600">Check your email to confirm your account.</p>
         <a
-          href="#/"
+          href="#/login"
           className="mt-6 inline-block rounded-lg bg-stone-900 px-5 py-2.5 text-white"
         >
-          Browse events
+          Log in
         </a>
       </div>
     );
@@ -87,35 +82,14 @@ export default function RegisterPage() {
         Registration is optional. You can book tickets without it.
       </p>
 
-      <div className="mt-6 grid grid-cols-2 rounded-lg bg-stone-200 p-1 text-sm">
-        {(['email', 'phone'] as Method[]).map((m) => (
-          <button
-            key={m}
-            type="button"
-            onClick={() => {
-              setMethod(m);
-              setContact('');
-              setError('');
-            }}
-            className={`rounded-md py-2 font-medium ${
-              method === m ? 'bg-white text-stone-900 shadow-sm' : 'text-stone-600'
-            }`}
-          >
-            {m === 'email' ? 'Email' : 'Phone number'}
-          </button>
-        ))}
-      </div>
-
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-stone-700">
-            {method === 'email' ? 'Email' : 'Phone number'}
-          </label>
+          <label className="mb-1 block text-sm font-medium text-stone-700">Email</label>
           <input
-            type={method === 'email' ? 'email' : 'tel'}
-            value={contact}
-            onChange={(e) => setContact(e.target.value)}
-            placeholder={method === 'email' ? 'you@example.com' : '+77001234567'}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
             required
             className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-stone-900"
           />
@@ -142,18 +116,11 @@ export default function RegisterPage() {
           </div>
 
           <div className="mt-3 rounded-lg border border-stone-200 bg-white p-3">
-            <p className="text-sm font-medium text-stone-700">
-              Your password must contain:
-            </p>
+            <p className="text-sm font-medium text-stone-700">Your password must contain:</p>
             <ul className="mt-2 space-y-1 text-sm">
               {rules.map((rule) => (
-                <li
-                  key={rule.text}
-                  className={rule.ok ? 'text-teal-700' : 'text-stone-500'}
-                >
-                  <span className="mr-2 inline-block w-4 font-bold">
-                    {rule.ok ? '✓' : '○'}
-                  </span>
+                <li key={rule.text} className={rule.ok ? 'text-teal-700' : 'text-stone-500'}>
+                  <span className="mr-2 inline-block w-4 font-bold">{rule.ok ? '✓' : '○'}</span>
                   {rule.text}
                 </li>
               ))}
@@ -189,7 +156,14 @@ export default function RegisterPage() {
         </button>
       </form>
 
-      <div className="mt-6 text-center">
+      <p className="mt-6 text-center text-sm text-stone-600">
+        Already have an account?{' '}
+        <a href="#/login" className="underline">
+          Log in
+        </a>
+      </p>
+
+      <div className="mt-3 text-center">
         <a href="#/" className="text-sm text-stone-600 underline">
           Skip for now
         </a>
