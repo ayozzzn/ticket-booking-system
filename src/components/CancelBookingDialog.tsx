@@ -1,17 +1,26 @@
 import { AlertTriangle, Loader2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cancelBooking } from '@/lib/bookingApi';
+import { cancelMyBooking } from '@/lib/myBookingsApi';
 import { formatEventDate, formatEventTime, formatPrice } from '@/lib/format';
 import type { BookingReceipt } from '@/types/ticketing';
 
 interface CancelBookingDialogProps {
   receipt: BookingReceipt;
   email?: string;
+  /** When true the cancellation goes through the signed-in account (no email needed). */
+  accountMode?: boolean;
   onClose: () => void;
   onCancelled: (updated: BookingReceipt) => void;
 }
 
-export default function CancelBookingDialog({ receipt, email, onClose, onCancelled }: CancelBookingDialogProps) {
+export default function CancelBookingDialog({
+  receipt,
+  email,
+  accountMode,
+  onClose,
+  onCancelled,
+}: CancelBookingDialogProps) {
   const [understood, setUnderstood] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -21,8 +30,8 @@ export default function CancelBookingDialog({ receipt, email, onClose, onCancell
       if (e.key === 'Escape' && !submitting) onClose();
     };
     window.addEventListener('keydown', onKeyDown);
-    
-    // Убрали блокировку body, чтобы страница могла прокручиваться
+
+    // The body is not locked, so the page can still scroll.
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
@@ -33,7 +42,9 @@ export default function CancelBookingDialog({ receipt, email, onClose, onCancell
     setError('');
     setSubmitting(true);
     try {
-      const updated = await cancelBooking(receipt.booking_code, email ?? receipt.customer_email);
+      const updated = accountMode
+        ? await cancelMyBooking(receipt.booking_code)
+        : await cancelBooking(receipt.booking_code, email ?? receipt.customer_email);
       onCancelled(updated);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'We could not cancel your booking.');
@@ -46,7 +57,6 @@ export default function CancelBookingDialog({ receipt, email, onClose, onCancell
   return (
     <div
       role="presentation"
-      // Добавили overflow-y-auto и items-start, чтобы можно было скроллить
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-stone-900/60 p-4 backdrop-blur-sm sm:p-6"
     >
       <div
@@ -54,7 +64,6 @@ export default function CancelBookingDialog({ receipt, email, onClose, onCancell
         aria-modal="true"
         aria-labelledby="cancel-title"
         aria-describedby="cancel-description"
-        // Убрали max-h, добавили mb-8 для отступа снизу при скролле
         className="animate-modal-in relative my-8 w-full max-w-md rounded-3xl bg-white p-5 shadow-2xl sm:p-6"
       >
         <div className="flex items-start justify-between gap-4">

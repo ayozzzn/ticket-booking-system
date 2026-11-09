@@ -20,9 +20,7 @@ const GUEST_ITEMS: NavItem[] = [
   { label: 'Sign up', href: '#/register', route: 'register' },
 ];
 
-const USER_ITEMS: NavItem[] = [
-  { label: 'My tickets', href: '#/my-bookings', route: 'my-bookings' },
-];
+const USER_ITEMS: NavItem[] = [{ label: 'My profile', href: '#/profile', route: 'profile' }];
 
 export default function SiteHeader({ activeRoute }: SiteHeaderProps) {
   const { session } = useSession();

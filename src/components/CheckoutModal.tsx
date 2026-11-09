@@ -2,6 +2,7 @@ import { AlertCircle, Loader2, Minus, Plus, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import BookingReceiptCard from '@/components/BookingReceiptCard';
 import FormField from '@/components/FormField';
+import { useSession } from '@/hooks/useSession';
 import { createBooking } from '@/lib/bookingApi';
 import { formatPrice, ticketsRemaining } from '@/lib/format';
 import type { BookingReceipt, EventRecord, TicketTier } from '@/types/ticketing';
@@ -17,6 +18,7 @@ interface CheckoutModalProps {
 }
 
 export default function CheckoutModal({ event, tier, onClose, onBooked }: CheckoutModalProps) {
+  const { session } = useSession();
   const maxQuantity = Math.min(MAX_TICKETS_PER_BOOKING, ticketsRemaining(tier));
   const [quantity, setQuantity] = useState(1);
   const [name, setName] = useState('');
@@ -24,6 +26,14 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
   const [receipt, setReceipt] = useState<BookingReceipt | null>(null);
+
+  // Prefill from the signed-in account (only fills empty fields, so typing is never overwritten).
+  useEffect(() => {
+    const user = session?.user;
+    if (!user) return;
+    setEmail((prev) => prev || user.email || '');
+    setName((prev) => prev || (user.user_metadata?.full_name as string | undefined) || '');
+  }, [session]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -104,6 +114,15 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         {receipt ? (
           <div className="mt-6 space-y-6">
             <BookingReceiptCard receipt={receipt} />
+            {session && (
+              <p className="text-sm text-stone-600">
+                This booking is saved in your{' '}
+                <a href="#/profile" onClick={onClose} className="font-medium text-teal-800 underline">
+                  profile
+                </a>
+                , where you can also cancel it.
+              </p>
+            )}
             <button
               type="button"
               onClick={onClose}
@@ -165,7 +184,11 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
               disabled={submitting}
               placeholder="you@example.com"
             />
-            <p className="-mt-3 text-sm text-stone-500">Your booking code will be sent to this address.</p>
+            <p className="-mt-3 text-sm text-stone-500">
+              {session
+                ? 'You are logged in: this booking will appear in your profile.'
+                : 'Your booking code will be sent to this address.'}
+            </p>
 
             {formError && (
               <div role="alert" className="flex items-start gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-800 ring-1 ring-rose-200">

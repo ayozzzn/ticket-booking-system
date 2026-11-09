@@ -9,8 +9,10 @@ interface BookingActionsProps {
   receipt: BookingReceipt;
   /** Called with the fresh booking after a successful cancellation. */
   onUpdated: (receipt: BookingReceipt) => void;
-  /** Optional: email to use for cancellation (e.g. the signed-in user's email). */
+  /** Optional: email to use for cancellation (guest lookup flow). */
   email?: string;
+  /** When true the booking is cancelled through the signed-in account (profile page). */
+  accountMode?: boolean;
 }
 
 function useNow(intervalMs = 30_000) {
@@ -24,7 +26,7 @@ function useNow(intervalMs = 30_000) {
 
 const stamp = (iso: string) => `${formatEventDate(iso)} · ${formatEventTime(iso)}`;
 
-export default function BookingActions({ receipt, onUpdated, email }: BookingActionsProps) {
+export default function BookingActions({ receipt, onUpdated, email, accountMode }: BookingActionsProps) {
   const now = useNow();
   const [open, setOpen] = useState(false);
   const [justCancelled, setJustCancelled] = useState(false);
@@ -128,6 +130,7 @@ export default function BookingActions({ receipt, onUpdated, email }: BookingAct
         <CancelBookingDialog
           receipt={receipt}
           email={email}
+          accountMode={accountMode}
           onClose={() => setOpen(false)}
           onCancelled={handleCancelled}
         />

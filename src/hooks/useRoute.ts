@@ -7,25 +7,43 @@ export type Route =
   | { name: 'admin' }
   | { name: 'register' }
   | { name: 'login' }
-  | { name: 'my-bookings' };
+  | { name: 'profile' };
 
-function parseRoute(hash: string): Route {
-  const path = hash.replace(/^#/, '') || '/';
-  const eventMatch = /^\/events\/([0-9a-f-]{36})$/i.exec(path);
-  if (eventMatch) return { name: 'event', id: eventMatch[1] };
-  if (path === '/bookings') return { name: 'bookings' };
-  if (path === '/admin') return { name: 'admin' };
-  if (path === '/register') return { name: 'register' };
-  if (path === '/login') return { name: 'login' };
-  if (path === '/my-bookings') return { name: 'my-bookings' };
-  return { name: 'home' };
+function parseHash(hash: string): Route {
+  // Anything that is not "#/something" (e.g. Supabase's "#access_token=..." after
+  // an email confirmation link) falls back to the home page.
+  if (!hash.startsWith('#/')) return { name: 'home' };
+
+  const path = hash.slice(2).split(/[?#]/)[0];
+  const parts = path.split('/').filter(Boolean);
+
+  switch (parts[0]) {
+    case 'events':
+      return parts[1] ? { name: 'event', id: parts[1] } : { name: 'home' };
+    case 'bookings':
+      return { name: 'bookings' };
+    case 'admin':
+      return { name: 'admin' };
+    case 'register':
+      return { name: 'register' };
+    case 'login':
+      return { name: 'login' };
+    case 'profile':
+    case 'my-bookings': // old link, kept so nothing breaks
+      return { name: 'profile' };
+    default:
+      return { name: 'home' };
+  }
 }
 
 export function useRoute(): Route {
-  const [route, setRoute] = useState<Route>(() => parseRoute(window.location.hash));
+  const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash));
 
   useEffect(() => {
-    const onChange = () => setRoute(parseRoute(window.location.hash));
+    const onChange = () => {
+      setRoute(parseHash(window.location.hash));
+      window.scrollTo(0, 0);
+    };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);
   }, []);
