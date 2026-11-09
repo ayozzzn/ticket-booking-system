@@ -23,7 +23,7 @@ The React website runs in the user's browser and talks to Supabase over HTTPS. S
 | Role | Can do | Cannot do | Enforced in |
 |---|---|---|---|
 | Guest (anon) | Read events and ticket types. Create a booking. Look up a booking with booking code and email. Cancel a future booking with code and email. | Read the `bookings` table. Read `admin_users` or admin views. Create, edit or delete events. | `20261101171058_create_ticket_booking_system.sql`, `20261102120000_database_improvements.sql` |
-| Registered customer (signed in, not admin) | Same as guest. See own tickets on the "My tickets" page (`get_my_bookings`, access rule to be verified). | Open admin data. The account is not in `admin_users`, so no admin policy applies. | `20261102180000_admin_panel.sql`, `20261102190000_admin_panel_hardening.sql`, `src/lib/adminApi.ts`, the my_bookings migration (`20261102200000_...`) |
+| Registered customer (signed in, not admin) | Same as guest. See own tickets on the "My tickets" page (`get_my_bookings` filters by `auth.jwt() ->> 'email'`). | Open admin data. The account is not in `admin_users`, so no admin policy applies. | `20261102180000_admin_panel.sql`, `20261102190000_admin_panel_hardening.sql`, `src/lib/adminApi.ts`, `20261102200000_my_bookings_status.sql` |
 | Admin | Create, edit and delete events and ticket types. Read all bookings. | Change bookings directly in the table (only a SELECT policy exists). | `20261102180000_admin_panel.sql` |
 
 ## 4. Threats and controls
@@ -49,9 +49,9 @@ Tested by: Dinara Turarbekova, Date: 09-11-2026
 | T3 | Find my booking with a correct code and the correct email | Booking is shown | Booking displayed | Pass |
 | T4 | Sign in with a non-admin account | Message: "This account does not have administrator access." | Access denied error | Pass |
 | T5 | Sign in as admin | Events and bookings are shown | Admin panel loaded | Pass |
-| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | Isolated successfully | Pass |
+| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | Not run yet | Not run yet |
 
-Automated checks written by the team: `supabase/tests/admin_panel_checks.sql` (anon and non-admin users cannot write events, a non-admin cannot read bookings or admin statistics, the admin can manage events, nobody can edit the `sold` counter by hand) and `supabase/tests/db_checks.sql`. Result of running them: Passed successfully.
+Automated checks written by the team: `supabase/tests/admin_panel_checks.sql` (anon and non-admin users cannot write events, a non-admin cannot read bookings or admin statistics, the admin can manage events, nobody can edit the `sold` counter by hand) and `supabase/tests/db_checks.sql`. Result of running them: Not run yet.
 
 ## 6. Known limitations and next steps
 
