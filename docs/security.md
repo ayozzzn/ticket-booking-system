@@ -49,7 +49,7 @@ Tested by: Dinara Turarbekova, Date: 09-11-2026
 | T3 | Find my booking with a correct code and the correct email | Booking is shown | Booking displayed | Pass |
 | T4 | Sign in with a non-admin account | Message: "This account does not have administrator access." | Access denied error | Pass |
 | T5 | Sign in as admin | Events and bookings are shown | Admin panel loaded | Pass |
-| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | Not run yet | Not run yet |
+| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | Verified: turarbekovadinara15@gmail.com does not see turarbekovadinara5@gmail.com's tickets | Pass |
 
 Automated checks written by the team: `supabase/tests/admin_panel_checks.sql` (anon and non-admin users cannot write events, a non-admin cannot read bookings or admin statistics, the admin can manage events, nobody can edit the `sold` counter by hand) and `supabase/tests/db_checks.sql`. Result of running them: Not run yet.
 
