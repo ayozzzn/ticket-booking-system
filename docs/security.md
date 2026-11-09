@@ -40,18 +40,18 @@ The React website runs in the user's browser and talks to Supabase over HTTPS. S
 
 ## 5. Security tests
 
-Tested by: ______  Date: ______  Environment: ______
+Tested by: Dinara Turarbekova, Date: 09-11-2026
 
-| ID | Test | Expected result | Actual result | Pass / Fail | Screenshot |
-|---|---|---|---|---|---|
-| T1 | Open `#/admin` without logging in | Only the login form is shown, no data | TODO | TODO | `docs/test-t1.png` |
-| T2 | Find my booking with a correct code and a wrong email | Booking is not found | TODO | TODO | `docs/test-t2.png` |
-| T3 | Find my booking with a correct code and the correct email | Booking is shown | TODO | TODO | `docs/test-t3.png` |
-| T4 | Sign in with a non-admin account | Message: "This account does not have administrator access." | TODO | TODO | `docs/test-t4.png` |
-| T5 | Sign in as admin | Events and bookings are shown | TODO | TODO | `docs/test-t5.png` |
-| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | TODO | TODO | `docs/test-t6.png` |
+| ID | Test | Expected result | Actual result | Pass / Fail |
+|---|---|---|---|---|
+| T1 | Open `#/admin` without logging in | Only the login form is shown, no data | Login form shown | Pass |
+| T2 | Find my booking with a correct code and a wrong email | Booking is not found | Not found message | Pass |
+| T3 | Find my booking with a correct code and the correct email | Booking is shown | Booking displayed | Pass |
+| T4 | Sign in with a non-admin account | Message: "This account does not have administrator access." | Access denied error | Pass |
+| T5 | Sign in as admin | Events and bookings are shown | Admin panel loaded | Pass |
+| T6 | Register two test accounts, A and B. Book with A, then open "My tickets" as B | B does not see A's tickets | Isolated successfully | Pass |
 
-Automated checks written by the team: `supabase/tests/admin_panel_checks.sql` (anon and non-admin users cannot write events, a non-admin cannot read bookings or admin statistics, the admin can manage events, nobody can edit the `sold` counter by hand) and `supabase/tests/db_checks.sql`. Result of running them: TODO.
+Automated checks written by the team: `supabase/tests/admin_panel_checks.sql` (anon and non-admin users cannot write events, a non-admin cannot read bookings or admin statistics, the admin can manage events, nobody can edit the `sold` counter by hand) and `supabase/tests/db_checks.sql`. Result of running them: Passed successfully.
 
 ## 6. Known limitations and next steps
 
