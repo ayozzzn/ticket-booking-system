@@ -22,3 +22,7 @@ dist-ssr
 *.sw?
 .env
 .bolt/
+
+backend/.env
+backend/node_modules/
+.env.local
