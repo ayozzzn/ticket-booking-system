@@ -5,6 +5,7 @@ import BookingLookupPage from '@/components/BookingLookupPage';
 import RegisterPage from '@/components/RegisterPage';
 import LoginPage from '@/components/LoginPage';
 import MyBookingsPage from '@/components/MyBookingsPage';
+import VersionBadge from '@/components/VersionBadge';
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
 
@@ -29,6 +30,7 @@ function App() {
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-stone-500 sm:flex-row sm:px-6 lg:px-8">
           <span className="font-display text-base text-stone-800">Stagepass</span>
           <span>Tickets are reserved instantly. Keep your booking code safe.</span>
+          <VersionBadge />
         </div>
       </footer>
     </div>
