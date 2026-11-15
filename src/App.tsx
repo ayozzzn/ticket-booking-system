@@ -4,8 +4,12 @@ import EventDetailPage from '@/components/EventDetailPage';
 import BookingLookupPage from '@/components/BookingLookupPage';
 import RegisterPage from '@/components/RegisterPage';
 import LoginPage from '@/components/LoginPage';
+<<<<<<< HEAD
 import MyBookingsPage from '@/components/MyBookingsPage';
 import VersionBadge from '@/components/VersionBadge';
+=======
+import ProfilePage from '@/components/ProfilePage';
+>>>>>>> 002b5a2c846503ddd6747fa452ba7fb2e8613c50
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
 
@@ -23,7 +27,7 @@ function App() {
         {route.name === 'admin' && <AdminPanel />}
         {route.name === 'register' && <RegisterPage />}
         {route.name === 'login' && <LoginPage />}
-        {route.name === 'my-bookings' && <MyBookingsPage />}
+        {route.name === 'profile' && <ProfilePage />}
       </main>
 
       <footer className="border-t border-stone-200 bg-white">
