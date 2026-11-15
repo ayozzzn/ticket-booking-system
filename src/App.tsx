@@ -4,12 +4,8 @@ import EventDetailPage from '@/components/EventDetailPage';
 import BookingLookupPage from '@/components/BookingLookupPage';
 import RegisterPage from '@/components/RegisterPage';
 import LoginPage from '@/components/LoginPage';
-<<<<<<< HEAD
-import MyBookingsPage from '@/components/MyBookingsPage';
-import VersionBadge from '@/components/VersionBadge';
-=======
 import ProfilePage from '@/components/ProfilePage';
->>>>>>> 002b5a2c846503ddd6747fa452ba7fb2e8613c50
+import VersionBadge from '@/components/VersionBadge';
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
 
