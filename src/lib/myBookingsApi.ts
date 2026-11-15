@@ -1,3 +1,4 @@
+import { apiRequest } from '@/lib/apiClient';
 import { supabase } from '@/lib/supabase';
 import type { BookingReceipt } from '@/types/ticketing';
 
@@ -8,29 +9,17 @@ export interface Profile {
 }
 
 export async function fetchMyBookings(): Promise<BookingReceipt[]> {
-  const { data, error } = await supabase.rpc('get_my_bookings');
-
-  if (error) {
-    console.error('Failed to load my bookings', error);
-    throw new Error('We could not load your tickets. Please try again.');
-  }
-
-  return Array.isArray(data) ? (data as BookingReceipt[]) : [];
+  const data = await apiRequest<unknown>('/api/bookings/my', {}, true);
+  return Array.isArray(data) ? data as BookingReceipt[] : [];
 }
 
 /** Cancel one of the signed-in user's bookings (no email needed, the account is the proof). */
 export async function cancelMyBooking(code: string): Promise<BookingReceipt> {
-  const { data, error } = await supabase.rpc('cancel_my_booking', { p_code: code });
-
-  if (error) {
-    console.error('Cancellation failed', error);
-    throw new Error(error.message || 'We could not cancel your booking. Please try again.');
-  }
-
-  if (typeof data !== 'object' || data === null || Array.isArray(data)) {
-    throw new Error('Your booking was cancelled but the updated details could not be loaded.');
-  }
-
+  const data = await apiRequest<unknown>('/api/bookings/my/cancel', {
+    method: 'POST', body: JSON.stringify({ code }),
+  }, true);
+  if (typeof data !== 'object' || data === null || Array.isArray(data))
+    throw new Error('Invalid cancellation response from backend.');
   return data as BookingReceipt;
 }
 
