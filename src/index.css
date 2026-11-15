@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-wine-950;
+  }
+}
+
+@layer components {
+  .kesh-bg {
+    background:
+      radial-gradient(900px 500px at 85% -5%, rgba(155, 28, 44, 0.55), transparent 70%),
+      radial-gradient(700px 500px at 0% 40%, rgba(74, 13, 20, 0.7), transparent 70%),
+      #1a0407;
+  }
+}

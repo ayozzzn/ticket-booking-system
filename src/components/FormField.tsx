@@ -8,12 +8,12 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 export default function FormField({ label, id, className = '', ...inputProps }: FormFieldProps) {
   return (
     <div className="space-y-2">
-      <label htmlFor={id} className="block text-sm font-medium text-stone-700">
+      <label htmlFor={id} className="block text-sm font-medium text-wine-900">
         {label}
       </label>
       <input
         id={id}
-        className={`w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-stone-900 placeholder:text-stone-400 transition focus:border-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-700/15 ${className}`}
+        className={`w-full rounded-xl border border-wine-900/25 bg-white px-4 py-3 text-wine-900 placeholder:text-wine-900/40 transition focus:border-crimson focus:outline-none focus:ring-4 focus:ring-crimson/15 disabled:opacity-60 ${className}`}
         {...inputProps}
       />
     </div>

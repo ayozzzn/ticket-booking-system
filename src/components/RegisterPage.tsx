@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+const inputClass =
+  'w-full rounded-xl border border-wine-900/25 bg-white px-4 py-3 text-wine-900 placeholder:text-wine-900/40 outline-none transition focus:border-crimson focus:ring-4 focus:ring-crimson/15';
+
 function getPasswordChecks(password: string) {
   return {
     length: password.length >= 8 && password.length <= 12,
@@ -87,28 +90,26 @@ export default function RegisterPage() {
 
   if (done) {
     return (
-      <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <h1 className="font-display text-2xl text-stone-900">Check your email</h1>
-        <p className="mt-3 text-stone-600">
-          We sent a confirmation link to <span className="font-medium text-stone-900">{email.trim()}</span>.
-          Open it, then log in. If it is not there in a minute, check the spam folder.
-        </p>
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
-        {info && <p className="mt-3 text-sm text-teal-700">{info}</p>}
-        <button
-          type="button"
-          onClick={handleResend}
-          className="mt-4 text-sm font-medium text-teal-800 underline"
-        >
-          Send the email again
-        </button>
-        <div>
-          <a
-            href="#/login"
-            className="mt-6 inline-block rounded-lg bg-stone-900 px-5 py-2.5 text-white"
-          >
-            Go to log in
-          </a>
+      <div className="mx-auto max-w-md px-4 py-16">
+        <div className="rounded-3xl bg-cream p-8 text-center text-wine-900 shadow-xl shadow-black/40">
+          <h1 className="font-display text-4xl font-semibold text-wine-900">Check your email</h1>
+          <p className="mt-3 text-wine-900/75">
+            We sent a confirmation link to <span className="font-semibold text-wine-900">{email.trim()}</span>.
+            Open it, then log in. If it is not there in a minute, check the spam folder.
+          </p>
+          {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
+          {info && <p className="mt-3 text-sm text-emerald-700">{info}</p>}
+          <button type="button" onClick={handleResend} className="mt-4 text-sm font-medium text-crimson underline">
+            Send the email again
+          </button>
+          <div>
+            <a
+              href="#/login"
+              className="mt-6 inline-block rounded-full bg-crimson px-6 py-3 font-semibold text-cream transition hover:bg-crimson-bright"
+            >
+              Go to log in
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -122,16 +123,19 @@ export default function RegisterPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <h1 className="font-display text-3xl text-stone-900">Create an account</h1>
-      <p className="mt-2 text-stone-600">
+    <div className="mx-auto max-w-md px-4 py-14">
+      <h1 className="font-display text-6xl font-medium leading-none text-gold">Create an account</h1>
+      <p className="mt-4 text-cream-dim">
         With an account all your tickets are in one place and you can cancel them there. Registration is
         optional: you can still book without it.
       </p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 space-y-4 rounded-3xl bg-cream p-6 text-wine-900 shadow-xl shadow-black/40 sm:p-8"
+      >
         <div>
-          <label htmlFor="reg-name" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="reg-name" className="mb-1.5 block text-sm font-medium text-wine-900">
             Full name
           </label>
           <input
@@ -143,12 +147,12 @@ export default function RegisterPage() {
             autoComplete="name"
             maxLength={120}
             required
-            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-stone-900"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label htmlFor="reg-email" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="reg-email" className="mb-1.5 block text-sm font-medium text-wine-900">
             Email
           </label>
           <input
@@ -159,12 +163,12 @@ export default function RegisterPage() {
             placeholder="you@example.com"
             autoComplete="email"
             required
-            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-stone-900"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label htmlFor="reg-password" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="reg-password" className="mb-1.5 block text-sm font-medium text-wine-900">
             Password
           </label>
           <div className="relative">
@@ -176,22 +180,22 @@ export default function RegisterPage() {
               maxLength={20}
               autoComplete="new-password"
               required
-              className="w-full rounded-lg border border-stone-300 bg-white py-2.5 pl-3 pr-16 outline-none focus:border-stone-900"
+              className={`${inputClass} pr-16`}
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-0 px-3 text-sm font-medium text-stone-600 hover:text-stone-900"
+              className="absolute inset-y-0 right-0 px-4 text-sm font-medium text-wine-900/60 hover:text-crimson"
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
           </div>
 
-          <div className="mt-3 rounded-lg border border-stone-200 bg-white p-3">
-            <p className="text-sm font-medium text-stone-700">Your password must contain:</p>
+          <div className="mt-3 rounded-xl bg-white/60 p-3 ring-1 ring-wine-900/15">
+            <p className="text-sm font-medium text-wine-900">Your password must contain:</p>
             <ul className="mt-2 space-y-1 text-sm">
               {rules.map((rule) => (
-                <li key={rule.text} className={rule.ok ? 'text-teal-700' : 'text-stone-500'}>
+                <li key={rule.text} className={rule.ok ? 'text-emerald-700' : 'text-wine-900/55'}>
                   <span className="mr-2 inline-block w-4 font-bold">{rule.ok ? '✓' : '○'}</span>
                   {rule.text}
                 </li>
@@ -201,7 +205,7 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label htmlFor="reg-confirm" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="reg-confirm" className="mb-1.5 block text-sm font-medium text-wine-900">
             Confirm password
           </label>
           <input
@@ -212,12 +216,12 @@ export default function RegisterPage() {
             maxLength={20}
             autoComplete="new-password"
             required
-            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-stone-900"
+            className={inputClass}
           />
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-700">
             {error}
           </p>
         )}
@@ -225,21 +229,21 @@ export default function RegisterPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-stone-900 py-3 font-medium text-white disabled:opacity-60"
+          className="w-full rounded-full bg-crimson py-3.5 font-semibold text-cream transition hover:bg-crimson-bright disabled:opacity-60"
         >
           {loading ? 'Please wait...' : 'Register'}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-stone-600">
+      <p className="mt-6 text-center text-sm text-cream-dim">
         Already have an account?{' '}
-        <a href="#/login" className="underline">
+        <a href="#/login" className="font-medium text-gold underline">
           Log in
         </a>
       </p>
 
       <div className="mt-3 text-center">
-        <a href="#/" className="text-sm text-stone-600 underline">
+        <a href="#/" className="text-sm text-cream-dim underline hover:text-cream">
           Skip for now
         </a>
       </div>

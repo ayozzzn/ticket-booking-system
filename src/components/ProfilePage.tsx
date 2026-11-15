@@ -110,23 +110,28 @@ export default function ProfilePage() {
   }
 
   if (sessionLoading) {
-    return <div className="mx-auto max-w-3xl px-4 py-12 text-stone-600">Loading...</div>;
+    return <div className="mx-auto max-w-3xl px-4 py-12 text-cream-dim">Loading...</div>;
   }
 
   if (!user) {
     return (
-      <div className="mx-auto max-w-md px-4 py-16 text-center">
-        <h1 className="font-display text-2xl text-stone-900">Please log in</h1>
-        <p className="mt-3 text-stone-600">Log in to see your tickets and manage your bookings.</p>
-        <a href="#/login" className="mt-6 inline-block rounded-lg bg-stone-900 px-5 py-2.5 text-white">
-          Log in
-        </a>
-        <p className="mt-4 text-sm text-stone-600">
-          No account?{' '}
-          <a href="#/register" className="underline">
-            Sign up
+      <div className="mx-auto max-w-md px-4 py-16">
+        <div className="rounded-3xl bg-cream p-8 text-center text-wine-900 shadow-xl shadow-black/40">
+          <h1 className="font-display text-4xl font-semibold text-wine-900">Please log in</h1>
+          <p className="mt-3 text-wine-900/75">Log in to see your tickets and manage your bookings.</p>
+          <a
+            href="#/login"
+            className="mt-6 inline-block rounded-full bg-crimson px-6 py-3 font-semibold text-cream transition hover:bg-crimson-bright"
+          >
+            Log in
           </a>
-        </p>
+          <p className="mt-4 text-sm text-wine-900/70">
+            No account?{' '}
+            <a href="#/register" className="font-medium text-crimson underline">
+              Sign up
+            </a>
+          </p>
+        </div>
       </div>
     );
   }
@@ -137,11 +142,11 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <section className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-white p-6 ring-1 ring-stone-200">
+      <section className="flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-cream p-6 text-wine-900 shadow-xl shadow-black/40">
         <div className="flex min-w-0 items-center gap-4">
           <span
             aria-hidden="true"
-            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-teal-800 font-display text-2xl text-white"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-crimson font-display text-3xl text-cream"
           >
             {initial}
           </span>
@@ -154,34 +159,34 @@ export default function ProfilePage() {
                   maxLength={120}
                   required
                   aria-label="Full name"
-                  className="w-56 rounded-lg border border-stone-300 px-3 py-2 text-sm outline-none focus:border-stone-900"
+                  className="w-56 rounded-xl border border-wine-900/25 bg-white px-3 py-2 text-sm text-wine-900 outline-none focus:border-crimson focus:ring-4 focus:ring-crimson/15"
                 />
                 <button
                   type="submit"
                   disabled={savingName}
-                  className="rounded-lg bg-stone-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-60"
+                  className="rounded-full bg-crimson px-4 py-2 text-sm font-semibold text-cream hover:bg-crimson-bright disabled:opacity-60"
                 >
                   {savingName ? 'Saving...' : 'Save'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditing(false)}
-                  className="rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100"
+                  className="rounded-full px-4 py-2 text-sm text-wine-900/70 hover:bg-wine-900/10"
                 >
                   Cancel
                 </button>
               </form>
             ) : (
               <>
-                <h1 className="truncate font-display text-2xl text-stone-900">{displayName}</h1>
-                <p className="truncate text-sm text-stone-600">{user.email}</p>
+                <h1 className="truncate font-display text-3xl font-semibold text-wine-900">{displayName}</h1>
+                <p className="truncate text-sm text-wine-900/70">{user.email}</p>
                 <button
                   type="button"
                   onClick={() => {
                     setNameDraft(fullName);
                     setEditing(true);
                   }}
-                  className="mt-1 text-sm font-medium text-teal-800 underline"
+                  className="mt-1 text-sm font-medium text-crimson underline"
                 >
                   Change name
                 </button>
@@ -193,14 +198,14 @@ export default function ProfilePage() {
         <button
           type="button"
           onClick={handleLogout}
-          className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-stone-600 ring-1 ring-stone-300 transition hover:bg-stone-100 hover:text-stone-900"
+          className="flex items-center gap-2 rounded-full px-4 py-2 text-sm text-wine-900/75 ring-1 ring-wine-900/25 transition hover:bg-wine-900/10 hover:text-wine-900"
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
           Log out
         </button>
       </section>
 
-      <h2 className="mt-10 font-display text-2xl text-stone-900">My tickets</h2>
+      <h2 className="mt-10 font-display text-4xl font-medium text-gold">My tickets</h2>
 
       <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Booking status">
         {(Object.keys(TAB_LABELS) as TabId[]).map((id) => {
@@ -212,10 +217,10 @@ export default function ProfilePage() {
               role="tab"
               aria-selected={active}
               onClick={() => setTab(id)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                 active
-                  ? 'bg-stone-900 text-white'
-                  : 'bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-100'
+                  ? 'bg-crimson text-cream'
+                  : 'text-cream-dim ring-1 ring-gold/35 hover:text-cream hover:ring-gold'
               }`}
             >
               {TAB_LABELS[id]} ({groups[id].length})
@@ -237,7 +242,7 @@ export default function ProfilePage() {
       )}
 
       {error && (
-        <div role="alert" className="mt-5 rounded-2xl bg-rose-50 p-4 text-sm text-rose-800 ring-1 ring-rose-200">
+        <div role="alert" className="mt-5 rounded-2xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
           {error}{' '}
           <button type="button" onClick={() => void load()} className="font-medium underline">
             Try again
@@ -246,19 +251,19 @@ export default function ProfilePage() {
       )}
 
       {loading && (
-        <div className="mt-8 flex items-center gap-3 text-stone-500" role="status">
+        <div className="mt-8 flex items-center gap-3 text-cream-dim" role="status">
           <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
           Loading your tickets...
         </div>
       )}
 
       {!loading && !error && list.length === 0 && (
-        <div className="mt-6 rounded-2xl bg-white p-8 text-center ring-1 ring-stone-200">
-          <p className="text-stone-600">{EMPTY_TEXT[tab]}</p>
+        <div className="mt-6 rounded-2xl bg-cream p-8 text-center text-wine-900">
+          <p className="text-wine-900/75">{EMPTY_TEXT[tab]}</p>
           {tab === 'upcoming' && (
             <a
               href="#/"
-              className="mt-4 inline-block rounded-full bg-stone-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-stone-700"
+              className="mt-4 inline-block rounded-full bg-crimson px-5 py-2.5 text-sm font-semibold text-cream hover:bg-crimson-bright"
             >
               Browse events
             </a>
@@ -266,40 +271,46 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="mt-6 space-y-4">
+      <div className="mt-6 space-y-5">
         {list.map((b) => {
           const open = openCode === b.booking_code;
           return (
-            <article key={b.booking_code} className="rounded-2xl bg-white p-5 ring-1 ring-stone-200">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <h3 className="font-display text-xl text-stone-900">{b.event_title}</h3>
-                  <p className="mt-1 flex items-center gap-2 text-sm text-stone-600">
-                    <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    {formatEventDate(b.event_starts_at)} · {formatEventTime(b.event_starts_at)}
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-sm text-stone-600">
-                    <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
-                    <span className="truncate">
-                      {b.event_venue}, {b.event_city}
-                    </span>
-                  </p>
+            <article
+              key={b.booking_code}
+              className="overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40"
+            >
+              <div className="p-5">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="font-display text-2xl font-semibold text-crimson">{b.event_title}</h3>
+                    <p className="mt-1 flex items-center gap-2 text-sm text-wine-900/75">
+                      <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      {formatEventDate(b.event_starts_at)} · {formatEventTime(b.event_starts_at)}
+                    </p>
+                    <p className="mt-1 flex items-center gap-2 text-sm text-wine-900/75">
+                      <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span className="truncate">
+                        {b.event_venue}, {b.event_city}
+                      </span>
+                    </p>
+                  </div>
+                  <BookingStatusBadge status={b.status} />
                 </div>
-                <BookingStatusBadge status={b.status} />
               </div>
 
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4 text-sm">
-                <p className="text-stone-600">
+              {/* Ticket stub */}
+              <div className="relative flex flex-wrap items-center justify-between gap-3 border-t-2 border-dashed border-crimson/35 px-5 py-4 text-sm before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950">
+                <p className="text-wine-900/75">
                   {b.quantity} × {b.tier_name} ·{' '}
-                  <span className="font-semibold text-stone-900">{formatPrice(b.total_cents)}</span>
+                  <span className="font-semibold text-wine-900">{formatPrice(b.total_cents)}</span>
                 </p>
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs tracking-widest text-stone-500">{b.booking_code}</span>
+                  <span className="font-mono text-xs tracking-widest text-wine-900/60">{b.booking_code}</span>
                   <button
                     type="button"
                     aria-expanded={open}
                     onClick={() => setOpenCode(open ? null : b.booking_code)}
-                    className="rounded-full px-4 py-2 text-sm font-medium text-teal-800 ring-1 ring-teal-700/30 transition hover:bg-teal-50"
+                    className="rounded-full px-4 py-2 text-sm font-medium text-crimson ring-1 ring-crimson/35 transition hover:bg-crimson/10"
                   >
                     {open ? 'Hide details' : tab === 'upcoming' ? 'Details and cancel' : 'Details'}
                   </button>
@@ -307,7 +318,7 @@ export default function ProfilePage() {
               </div>
 
               {open && (
-                <div className="mt-5 space-y-6 border-t border-stone-100 pt-5">
+                <div className="space-y-6 border-t border-wine-900/10 p-5">
                   <BookingReceiptCard receipt={b} />
                   <BookingActions
                     receipt={b}

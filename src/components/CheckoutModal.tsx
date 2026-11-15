@@ -85,18 +85,18 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) close();
       }}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-stone-900/60 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-wine-950/80 p-4 backdrop-blur-sm sm:items-center"
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="checkout-title"
-        className="animate-modal-in max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl sm:p-8"
+        className="animate-modal-in max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-cream p-6 text-wine-900 shadow-2xl sm:p-8"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-medium text-teal-800">{event.title}</p>
-            <h2 id="checkout-title" className="mt-1 font-display text-2xl text-stone-900">
+            <p className="text-sm font-medium text-crimson">{event.title}</p>
+            <h2 id="checkout-title" className="mt-1 font-display text-3xl font-semibold text-wine-900">
               {receipt ? 'Booking confirmed' : `${tier.name} tickets`}
             </h2>
           </div>
@@ -105,7 +105,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
             onClick={close}
             disabled={submitting}
             aria-label="Close"
-            className="rounded-full p-2 text-stone-500 transition hover:bg-stone-100 hover:text-stone-900 disabled:opacity-50"
+            className="rounded-full p-2 text-wine-900/60 transition hover:bg-wine-900/10 hover:text-wine-900 disabled:opacity-50"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -115,9 +115,9 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
           <div className="mt-6 space-y-6">
             <BookingReceiptCard receipt={receipt} />
             {session && (
-              <p className="text-sm text-stone-600">
+              <p className="text-sm text-wine-900/75">
                 This booking is saved in your{' '}
-                <a href="#/profile" onClick={onClose} className="font-medium text-teal-800 underline">
+                <a href="#/profile" onClick={onClose} className="font-medium text-crimson underline">
                   profile
                 </a>
                 , where you can also cancel it.
@@ -126,17 +126,17 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
             <button
               type="button"
               onClick={onClose}
-              className="w-full rounded-full bg-stone-900 py-3.5 font-semibold text-white transition hover:bg-stone-700"
+              className="w-full rounded-full bg-crimson py-3.5 font-semibold text-cream transition hover:bg-crimson-bright"
             >
               Done
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
-            <div className="flex items-center justify-between rounded-2xl bg-stone-50 p-4 ring-1 ring-stone-200">
+            <div className="flex items-center justify-between rounded-2xl bg-white/60 p-4 ring-1 ring-wine-900/15">
               <div>
-                <p className="font-medium text-stone-900">Number of tickets</p>
-                <p className="text-sm text-stone-600">
+                <p className="font-medium text-wine-900">Number of tickets</p>
+                <p className="text-sm text-wine-900/70">
                   {formatPrice(tier.price_cents)} each · up to {maxQuantity} available
                 </p>
               </div>
@@ -146,11 +146,11 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
                   aria-label="Remove one ticket"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1 || submitting}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-stone-800 ring-1 ring-stone-300 transition hover:bg-stone-100 disabled:opacity-40"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
                 >
                   <Minus className="h-4 w-4" aria-hidden="true" />
                 </button>
-                <span className="w-6 text-center text-lg font-semibold tabular-nums text-stone-900" aria-live="polite">
+                <span className="w-6 text-center text-lg font-semibold tabular-nums text-wine-900" aria-live="polite">
                   {quantity}
                 </span>
                 <button
@@ -158,7 +158,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
                   aria-label="Add one ticket"
                   onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
                   disabled={quantity >= maxQuantity || submitting}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-stone-800 ring-1 ring-stone-300 transition hover:bg-stone-100 disabled:opacity-40"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
                 >
                   <Plus className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -184,28 +184,28 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
               disabled={submitting}
               placeholder="you@example.com"
             />
-            <p className="-mt-3 text-sm text-stone-500">
+            <p className="-mt-3 text-sm text-wine-900/65">
               {session
                 ? 'You are logged in: this booking will appear in your profile.'
                 : 'Your booking code will be sent to this address.'}
             </p>
 
             {formError && (
-              <div role="alert" className="flex items-start gap-3 rounded-xl bg-rose-50 p-4 text-sm text-rose-800 ring-1 ring-rose-200">
+              <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
                 <span>{formError}</span>
               </div>
             )}
 
-            <div className="flex items-center justify-between border-t border-stone-200 pt-5">
-              <span className="text-stone-600">Total</span>
-              <span className="font-display text-3xl text-stone-900">{formatPrice(total)}</span>
+            <div className="flex items-center justify-between border-t-2 border-dashed border-crimson/35 pt-5">
+              <span className="text-wine-900/70">Total</span>
+              <span className="font-display text-4xl font-semibold text-wine-900">{formatPrice(total)}</span>
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-teal-800 py-3.5 font-semibold text-white shadow-sm transition hover:bg-teal-700 hover:shadow-md disabled:cursor-wait disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-crimson py-3.5 font-semibold text-cream shadow-sm transition hover:bg-crimson-bright hover:shadow-md disabled:cursor-wait disabled:opacity-70"
             >
               {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
               {submitting ? 'Confirming...' : 'Confirm booking'}

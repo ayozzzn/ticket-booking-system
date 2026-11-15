@@ -51,29 +51,29 @@ export default function EventCatalog() {
 
   return (
     <div>
-      <section className="border-b border-stone-200 bg-gradient-to-b from-stone-100 to-stone-50">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <p className="animate-fade-up text-sm font-semibold uppercase tracking-[0.2em] text-teal-800">
+      <section className="border-b border-gold/15">
+        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <p className="animate-fade-up text-base font-medium text-cream-dim">
             Live events, reserved in seconds
           </p>
-          <h1 className="animate-fade-up mt-4 max-w-3xl font-display text-4xl leading-[1.15] text-stone-900 sm:text-5xl lg:text-6xl [animation-delay:80ms]">
-            Find your next unforgettable night out.
+          <h1 className="animate-fade-up mt-4 max-w-4xl font-display text-6xl font-medium leading-[0.95] text-gold sm:text-7xl lg:text-8xl [animation-delay:80ms]">
+            Tonight is yours to book.
           </h1>
-          <p className="animate-fade-up mt-5 max-w-2xl text-lg leading-relaxed text-stone-600 [animation-delay:160ms]">
+          <p className="animate-fade-up mt-6 max-w-2xl text-lg leading-relaxed text-cream-dim [animation-delay:160ms]">
             Concerts, theatre, festivals and conferences. Pick your seats, confirm in one step and keep your booking
             code for the door.
           </p>
 
-          <div className="animate-fade-up mt-10 flex flex-col gap-4 [animation-delay:240ms]">
+          <div className="animate-fade-up mt-10 flex flex-col gap-5 [animation-delay:240ms]">
             <div className="relative max-w-xl">
-              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-stone-400" aria-hidden="true" />
+              <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/50" aria-hidden="true" />
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by event, venue or city"
                 aria-label="Search events"
-                className="w-full rounded-2xl border border-stone-300 bg-white py-4 pl-12 pr-4 text-stone-900 shadow-sm placeholder:text-stone-400 transition focus:border-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-700/15"
+                className="w-full rounded-full border border-gold/35 bg-cream/10 py-4 pl-13 pr-5 pl-14 text-cream placeholder:text-cream/50 transition focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/15"
               />
             </div>
 
@@ -86,10 +86,10 @@ export default function EventCatalog() {
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => setCategory(item)}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                    className={`rounded-full px-5 py-2 text-sm font-medium transition ${
                       isActive
-                        ? 'bg-stone-900 text-white shadow-sm'
-                        : 'bg-white text-stone-700 ring-1 ring-stone-200 hover:bg-stone-100 hover:text-stone-900'
+                        ? 'bg-crimson text-cream shadow-sm'
+                        : 'text-cream-dim ring-1 ring-gold/35 hover:text-cream hover:ring-gold'
                     }`}
                   >
                     {item}
@@ -103,20 +103,20 @@ export default function EventCatalog() {
 
       <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
         {status === 'loading' && (
-          <div className="flex items-center justify-center gap-3 py-24 text-stone-500" role="status">
+          <div className="flex items-center justify-center gap-3 py-24 text-cream-dim" role="status">
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
             Loading events...
           </div>
         )}
 
         {status === 'error' && (
-          <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl bg-white p-8 text-center ring-1 ring-rose-200">
-            <AlertCircle className="h-8 w-8 text-rose-700" aria-hidden="true" />
-            <p className="text-stone-700">{errorMessage}</p>
+          <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-2xl bg-cream p-8 text-center text-wine-900">
+            <AlertCircle className="h-8 w-8 text-crimson" aria-hidden="true" />
+            <p>{errorMessage}</p>
             <button
               type="button"
               onClick={() => void load()}
-              className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
+              className="rounded-full bg-crimson px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-crimson-bright"
             >
               Try again
             </button>
@@ -126,19 +126,19 @@ export default function EventCatalog() {
         {status === 'ready' && (
           <>
             <div className="mb-8 flex items-center justify-between">
-              <p className="text-sm text-stone-600">
+              <p className="text-sm text-gold">
                 {visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'}
               </p>
             </div>
 
             {visibleEvents.length === 0 ? (
-              <div className="flex flex-col items-center gap-4 rounded-2xl bg-white py-16 text-center ring-1 ring-stone-200">
-                <p className="font-display text-2xl text-stone-900">No events match your search</p>
-                <p className="text-stone-600">Try a different keyword or category.</p>
+              <div className="flex flex-col items-center gap-4 rounded-2xl bg-cream py-16 text-center text-wine-900">
+                <p className="font-display text-3xl font-semibold">No events match your search</p>
+                <p className="text-wine-900/75">Try a different keyword or category.</p>
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-700"
+                  className="rounded-full bg-crimson px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-crimson-bright"
                 >
                   Clear filters
                 </button>

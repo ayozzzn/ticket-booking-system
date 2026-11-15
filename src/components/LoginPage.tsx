@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
+const inputClass =
+  'w-full rounded-xl border border-wine-900/25 bg-white px-4 py-3 text-wine-900 placeholder:text-wine-900/40 outline-none transition focus:border-crimson focus:ring-4 focus:ring-crimson/15';
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -56,13 +59,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-12">
-      <h1 className="font-display text-3xl text-stone-900">Log in</h1>
-      <p className="mt-2 text-stone-600">Log in to see your tickets and manage your bookings.</p>
+    <div className="mx-auto max-w-md px-4 py-14">
+      <h1 className="font-display text-6xl font-medium leading-none text-gold">Log in</h1>
+      <p className="mt-4 text-cream-dim">Log in to see your tickets and manage your bookings.</p>
 
-      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+      <form
+        onSubmit={handleSubmit}
+        className="mt-8 space-y-4 rounded-3xl bg-cream p-6 text-wine-900 shadow-xl shadow-black/40 sm:p-8"
+      >
         <div>
-          <label htmlFor="login-email" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-wine-900">
             Email
           </label>
           <input
@@ -73,12 +79,12 @@ export default function LoginPage() {
             placeholder="you@example.com"
             autoComplete="email"
             required
-            className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-stone-900"
+            className={inputClass}
           />
         </div>
 
         <div>
-          <label htmlFor="login-password" className="mb-1 block text-sm font-medium text-stone-700">
+          <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-wine-900">
             Password
           </label>
           <div className="relative">
@@ -89,12 +95,12 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
-              className="w-full rounded-lg border border-stone-300 bg-white py-2.5 pl-3 pr-16 outline-none focus:border-stone-900"
+              className={`${inputClass} pr-16`}
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute inset-y-0 right-0 px-3 text-sm font-medium text-stone-600 hover:text-stone-900"
+              className="absolute inset-y-0 right-0 px-4 text-sm font-medium text-wine-900/60 hover:text-crimson"
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
@@ -102,21 +108,17 @@ export default function LoginPage() {
         </div>
 
         {error && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-red-700">
             {error}
           </p>
         )}
         {info && (
-          <p role="status" className="text-sm text-teal-700">
+          <p role="status" className="text-sm text-emerald-700">
             {info}
           </p>
         )}
         {needsConfirm && (
-          <button
-            type="button"
-            onClick={handleResend}
-            className="text-sm font-medium text-teal-800 underline"
-          >
+          <button type="button" onClick={handleResend} className="text-sm font-medium text-crimson underline">
             Send the confirmation email again
           </button>
         )}
@@ -124,15 +126,15 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-lg bg-stone-900 py-3 font-medium text-white disabled:opacity-60"
+          className="w-full rounded-full bg-crimson py-3.5 font-semibold text-cream transition hover:bg-crimson-bright disabled:opacity-60"
         >
           {loading ? 'Please wait...' : 'Log in'}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-stone-600">
+      <p className="mt-6 text-center text-sm text-cream-dim">
         No account?{' '}
-        <a href="#/register" className="underline">
+        <a href="#/register" className="font-medium text-gold underline">
           Sign up
         </a>
       </p>

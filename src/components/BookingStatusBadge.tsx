@@ -11,7 +11,7 @@ export default function BookingStatusBadge({ status, className = '' }: BookingSt
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${
-        cancelled ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'
+        cancelled ? 'bg-red-100 text-red-800' : 'bg-emerald-100 text-emerald-800'
       } ${className}`}
     >
       {cancelled ? (
