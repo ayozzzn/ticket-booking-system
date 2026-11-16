@@ -7,7 +7,7 @@
 */
 DO $$
 DECLARE
-  t_big   uuid := '10000000-0000-4000-8000-000000000101';  -- Midnight Jazz / General Admission
+  t_big   uuid := '10000000-0000-4000-8000-000000000301';  -- Neon Nights / Day Pass (6000 cents, event still in the future)
   t_small uuid := '10000000-0000-4000-8000-000000000402';  -- Glass Menagerie / Premium (few seats left)
   r jsonb;
   code text;
@@ -20,15 +20,15 @@ DECLARE
 BEGIN
   BEGIN  -- sub-transaction: rolled back by the sentinel at the end
 
-    -- T1: booking succeeds, counter grows, status is confirmed
+    -- T1: booking succeeds, counter grows (tickets are held), status is pending until paid
     SELECT sold INTO v_before FROM ticket_tiers WHERE id = t_big;
     r := create_booking(t_big, 2, 'Test User', 'Test@Example.com');
     code := r->>'booking_code';
     SELECT sold INTO v_after FROM ticket_tiers WHERE id = t_big;
     ASSERT v_after = v_before + 2, 'T1: sold must grow by the booked quantity';
-    ASSERT r->>'status' = 'confirmed', 'T1: new booking must be confirmed';
+    ASSERT r->>'status' = 'pending', 'T1: new booking must be pending until it is paid';
     ASSERT r->>'customer_email' = 'test@example.com', 'T1: email must be stored lowercase';
-    ASSERT (r->>'total_cents')::int = 2 * 4500, 'T1: total must equal unit price x quantity';
+    ASSERT (r->>'total_cents')::int = 2 * 6000, 'T1: total must equal unit price x quantity';
 
     -- T2: quantity 0 is rejected
     failed := false;
@@ -66,12 +66,12 @@ BEGIN
     BEGIN PERFORM cancel_booking(code, 'hacker@example.com'); EXCEPTION WHEN OTHERS THEN failed := true; END;
     ASSERT failed, 'T8: cancel with wrong email must fail';
 
-    -- T9: cancelling restores the counter and sets status; second cancel fails
+    -- T9: cancelling an unpaid booking releases the hold (status expired); second cancel fails
     SELECT sold INTO v_before FROM ticket_tiers WHERE id = t_big;
     r := cancel_booking(code, 'test@example.com');
     SELECT sold INTO v_after FROM ticket_tiers WHERE id = t_big;
     ASSERT v_after = v_before - 2, 'T9: cancel must return tickets to the tier';
-    ASSERT r->>'status' = 'cancelled', 'T9: status must be cancelled';
+    ASSERT r->>'status' = 'expired', 'T9: an unpaid booking that is given up becomes expired';
     failed := false;
     BEGIN PERFORM cancel_booking(code, 'test@example.com'); EXCEPTION WHEN OTHERS THEN failed := true; END;
     ASSERT failed, 'T9: cancelling twice must fail';
@@ -101,9 +101,9 @@ BEGIN
     EXCEPTION WHEN foreign_key_violation THEN failed := true; END;
     ASSERT failed, 'T12: mismatching event/tier must violate bookings_tier_event_fk';
 
-    -- T13: sold counters are consistent with confirmed bookings
+    -- T13: sold counters are consistent with held (pending) + confirmed bookings
     ASSERT NOT EXISTS (SELECT 1 FROM v_sold_integrity WHERE NOT is_consistent),
-      'T13: some ticket_tiers.sold values do not match confirmed bookings (see v_sold_integrity)';
+      'T13: some ticket_tiers.sold values do not match held + confirmed bookings (see v_sold_integrity)';
 
     RAISE EXCEPTION USING ERRCODE = 'P0999', MESSAGE = 'rollback test data';
   EXCEPTION WHEN SQLSTATE 'P0999' THEN
