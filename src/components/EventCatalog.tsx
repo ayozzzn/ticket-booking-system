@@ -1,7 +1,9 @@
-import { AlertCircle, Loader2, Search } from 'lucide-react';
+import { AlertCircle, ChevronRight, Loader2, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import DateStrip from '@/components/DateStrip';
 import EventCard from '@/components/EventCard';
 import { fetchEvents } from '@/lib/bookingApi';
+import { dayKey, longDay } from '@/lib/calendar';
 import type { EventRecord } from '@/types/ticketing';
 
 const ALL_CATEGORIES = 'All';
@@ -12,6 +14,8 @@ export default function EventCatalog() {
   const [errorMessage, setErrorMessage] = useState('');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState(ALL_CATEGORIES);
+  const [day, setDay] = useState<string | null>(null);
+  const today = dayKey(new Date());
 
   const load = useCallback(async () => {
     setStatus('loading');
@@ -28,31 +32,57 @@ export default function EventCatalog() {
     void load();
   }, [load]);
 
+  // Only events that have not happened yet (by Almaty date) are shown on the home page.
+  const upcoming = useMemo(() => events.filter((event) => dayKey(event.starts_at) >= today), [events, today]);
+
   const categories = useMemo(
-    () => [ALL_CATEGORIES, ...Array.from(new Set(events.map((event) => event.category))).sort()],
-    [events],
+    () => [ALL_CATEGORIES, ...Array.from(new Set(upcoming.map((event) => event.category))).sort()],
+    [upcoming],
   );
 
-  const visibleEvents = useMemo(() => {
+  // Search and category filter, but not the date: the date strip shows dots for these.
+  const matching = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    return events.filter((event) => {
+    return upcoming.filter((event) => {
       const matchesCategory = category === ALL_CATEGORIES || event.category === category;
       const matchesQuery =
         needle === '' ||
         [event.title, event.venue, event.city].some((value) => value.toLowerCase().includes(needle));
       return matchesCategory && matchesQuery;
     });
-  }, [events, query, category]);
+  }, [upcoming, query, category]);
+
+  const dayCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const event of matching) {
+      const key = dayKey(event.starts_at);
+      map.set(key, (map.get(key) ?? 0) + 1);
+    }
+    return map;
+  }, [matching]);
+
+  const visibleEvents = useMemo(
+    () => (day ? matching.filter((event) => dayKey(event.starts_at) === day) : matching),
+    [matching, day],
+  );
+
+  // On "All" the page is split into one row per category, like a poster wall.
+  const sections = useMemo(() => {
+    const map = new Map<string, EventRecord[]>();
+    for (const event of visibleEvents) map.set(event.category, [...(map.get(event.category) ?? []), event]);
+    return Array.from(map.entries()).sort((x, y) => y[1].length - x[1].length || x[0].localeCompare(y[0]));
+  }, [visibleEvents]);
 
   const clearFilters = () => {
     setQuery('');
     setCategory(ALL_CATEGORIES);
+    setDay(null);
   };
 
   return (
     <div>
       <section className="border-b border-gold/15">
-        <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
           <p className="animate-fade-up text-base font-medium text-cream-dim">
             Live events, reserved in seconds
           </p>
@@ -101,7 +131,13 @@ export default function EventCatalog() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+        {status === 'ready' && (
+          <div className="mb-10">
+            <DateStrip value={day} onChange={setDay} counts={dayCounts} />
+          </div>
+        )}
+
         {status === 'loading' && (
           <div className="flex items-center justify-center gap-3 py-24 text-cream-dim" role="status">
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
@@ -125,23 +161,54 @@ export default function EventCatalog() {
 
         {status === 'ready' && (
           <>
-            <div className="mb-8 flex items-center justify-between">
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="font-display text-3xl font-bold text-cream">
+                {day ? longDay(day) : category === ALL_CATEGORIES ? 'All upcoming events' : category}
+              </h2>
               <p className="text-sm text-gold">
                 {visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'}
               </p>
             </div>
 
             {visibleEvents.length === 0 ? (
-              <div className="flex flex-col items-center gap-4 rounded-2xl bg-cream py-16 text-center text-wine-900">
-                <p className="font-display text-3xl font-bold">No events match your search</p>
-                <p className="text-wine-900/75">Try a different keyword or category.</p>
+              <div className="flex flex-col items-center gap-4 rounded-2xl bg-cream px-6 py-16 text-center text-wine-900">
+                <p className="font-display text-3xl font-bold">
+                  {day ? 'Nothing on this date' : 'No events match your search'}
+                </p>
+                <p className="text-wine-900/75">
+                  {day ? 'Dates with a gold dot have events. Pick one of them or show all dates.' : 'Try a different keyword or category.'}
+                </p>
                 <button
                   type="button"
                   onClick={clearFilters}
                   className="rounded-full bg-crimson px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-crimson-bright"
                 >
-                  Clear filters
+                  Show all events
                 </button>
+              </div>
+            ) : category === ALL_CATEGORIES ? (
+              <div className="space-y-12">
+                {sections.map(([name, list]) => (
+                  <div key={name}>
+                    <div className="mb-4 flex items-baseline justify-between gap-3">
+                      <h3 className="font-display text-4xl font-bold text-gold">{name}</h3>
+                      <button
+                        type="button"
+                        onClick={() => setCategory(name)}
+                        className="flex shrink-0 items-center gap-1 text-sm font-semibold text-cream-dim transition hover:text-cream"
+                      >
+                        all {list.length} <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                      </button>
+                    </div>
+                    <div className="-mx-4 flex snap-x gap-6 overflow-x-auto px-4 pb-6 pt-1 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                      {list.map((event) => (
+                        <div key={event.id} className="flex w-72 shrink-0 snap-start sm:w-80 [&>a]:w-full">
+                          <EventCard event={event} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">

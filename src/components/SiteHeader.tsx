@@ -11,7 +11,6 @@ type NavItem = { label: string; href: string; route: Route['name']; highlight?: 
 
 const BASE_ITEMS: NavItem[] = [
   { label: 'Events', href: '#/', route: 'home' },
-  { label: 'Calendar', href: '#/calendar', route: 'calendar' },
   { label: 'Find my booking', href: '#/bookings', route: 'bookings' },
   { label: 'Admin', href: '#/admin', route: 'admin' },
 ];

@@ -5,7 +5,6 @@ import BookingLookupPage from '@/components/BookingLookupPage';
 import RegisterPage from '@/components/RegisterPage';
 import LoginPage from '@/components/LoginPage';
 import ProfilePage from '@/components/ProfilePage';
-import EventCalendarPage from '@/components/EventCalendarPage';
 import VersionBadge from '@/components/VersionBadge';
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
@@ -20,7 +19,6 @@ function App() {
       <main className="flex-1">
         {route.name === 'home' && <EventCatalog />}
         {route.name === 'event' && <EventDetailPage key={route.id} eventId={route.id} />}
-        {route.name === 'calendar' && <EventCalendarPage />}
         {route.name === 'bookings' && <BookingLookupPage />}
         {route.name === 'admin' && (
           <div className="min-h-[70vh] bg-[#f8efe8] text-stone-900">
