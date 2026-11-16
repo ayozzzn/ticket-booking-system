@@ -32,10 +32,11 @@ interface CreateBookingInput {
   customerEmail: string;
 }
 
+/** Creates a PENDING booking: the tickets are held for a few minutes until the payment is confirmed. */
 export async function createBooking(input: CreateBookingInput): Promise<BookingReceipt> {
   const data = await apiRequest<unknown>('/api/bookings', {
     method: 'POST', body: JSON.stringify(input),
-  });
+  }, 'optional'); // logged-in customers get the booking linked to their account
   if (!isBookingReceipt(data)) throw new Error('Invalid booking confirmation from backend.');
   return data;
 }
@@ -90,7 +91,7 @@ function isBookingReceipt(value: unknown): value is BookingReceipt {
     typeof v.event_title === 'string' &&
     typeof v.quantity === 'number' &&
     typeof v.total_cents === 'number' &&
-    (v.status === 'confirmed' || v.status === 'cancelled') &&
+    (v.status === 'confirmed' || v.status === 'cancelled' || v.status === 'pending' || v.status === 'expired') &&
     (v.cancelled_at === null || typeof v.cancelled_at === 'string')
   );
 }

@@ -2,8 +2,9 @@ import { AlertCircle, ArrowLeft, CalendarDays, Loader2, MapPin } from 'lucide-re
 import { useCallback, useEffect, useState } from 'react';
 import CheckoutModal from '@/components/CheckoutModal';
 import EventImage from '@/components/EventImage';
+import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { fetchEvent } from '@/lib/bookingApi';
-import { formatEventDate, formatEventTime, formatPrice, ticketsRemaining } from '@/lib/format';
+import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
 import type { EventRecord, TicketTier } from '@/types/ticketing';
 
 interface EventDetailPageProps {
@@ -15,6 +16,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
+  const rate = useExchangeRate();
 
   const load = useCallback(async () => {
     try {
@@ -135,6 +137,9 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                     <div className="relative flex items-center justify-between gap-6 border-t-2 border-dashed border-crimson/35 px-5 py-4 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950 sm:px-6">
                       <p className="font-display text-3xl font-semibold text-wine-900">
                         {formatPrice(tier.price_cents)}
+                        {rate && tier.price_cents > 0 && (
+                          <span className="ml-3 font-sans text-sm font-medium text-wine-900/55">≈ {formatKzt(centsToKzt(tier.price_cents, rate))}</span>
+                        )}
                       </p>
                       <button
                         type="button"

@@ -33,7 +33,7 @@ function App() {
       <footer className="border-t border-gold/20 bg-wine-950">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-cream-dim sm:flex-row sm:px-6 lg:px-8">
           <span className="font-display text-2xl font-semibold text-cream">Kesh</span>
-          <span>Tickets are reserved instantly. Keep your booking code safe.</span>
+          <span>Tickets are held for 10 minutes while you pay. Keep your booking code safe.</span>
           <VersionBadge />
         </div>
       </footer>

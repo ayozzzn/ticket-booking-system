@@ -38,7 +38,7 @@ export default function BookingLookupPage() {
       <p className="text-base font-medium text-cream-dim">Your tickets</p>
       <h1 className="mt-3 font-display text-6xl font-medium leading-none text-gold">Find my booking</h1>
       <p className="mt-4 text-cream-dim">
-        Enter the booking code from your confirmation and the email you booked with. You can also cancel here.
+        Enter the booking code from your confirmation and the email you booked with. You can also finish a payment or cancel here.
       </p>
 
       <form

@@ -4,8 +4,8 @@ import BookingActions from '@/components/BookingActions';
 import BookingReceiptCard from '@/components/BookingReceiptCard';
 import BookingStatusBadge from '@/components/BookingStatusBadge';
 import { useSession } from '@/hooks/useSession';
-import { isCancelled } from '@/lib/bookingStatus';
-import { formatEventDate, formatEventTime, formatPrice } from '@/lib/format';
+import { effectiveStatus } from '@/lib/bookingStatus';
+import { formatEventDate, formatEventTime, formatKzt, formatPrice } from '@/lib/format';
 import { fetchMyBookings, fetchProfile, updateProfileName } from '@/lib/myBookingsApi';
 import { supabase } from '@/lib/supabase';
 import type { BookingReceipt } from '@/types/ticketing';
@@ -65,7 +65,8 @@ export default function ProfilePage() {
     const cancelled: BookingReceipt[] = [];
 
     for (const b of bookings) {
-      if (isCancelled(b)) cancelled.push(b);
+      const status = effectiveStatus(b, new Date(now));
+      if (status === 'cancelled' || status === 'expired') cancelled.push(b);
       else if (new Date(b.event_starts_at).getTime() > now) upcoming.push(b);
       else past.push(b);
     }
@@ -79,12 +80,18 @@ export default function ProfilePage() {
 
   function handleUpdated(updated: BookingReceipt) {
     setBookings((prev) => prev.map((b) => (b.booking_code === updated.booking_code ? updated : b)));
-    setNotice(
-      `Booking ${updated.booking_code} was cancelled. ${updated.quantity} ${
-        updated.quantity === 1 ? 'ticket was' : 'tickets were'
-      } released.`,
-    );
-    setTab('cancelled');
+    const tickets = `${updated.quantity} ${updated.quantity === 1 ? 'ticket was' : 'tickets were'}`;
+    if (updated.status === 'confirmed') {
+      setNotice(`Payment received. Booking ${updated.booking_code} is confirmed.`);
+      setTab('upcoming');
+    } else if (updated.status === 'expired') {
+      setNotice(`Booking ${updated.booking_code} was released. ${tickets} released.`);
+      setTab('cancelled');
+    } else {
+      const refund = updated.payment?.refund_kzt ? ` Refund: ${formatKzt(updated.payment.refund_kzt)}.` : '';
+      setNotice(`Booking ${updated.booking_code} was cancelled. ${tickets} released.${refund}`);
+      setTab('cancelled');
+    }
   }
 
   async function handleSaveName(e: FormEvent) {
@@ -294,7 +301,7 @@ export default function ProfilePage() {
                       </span>
                     </p>
                   </div>
-                  <BookingStatusBadge status={b.status} />
+                  <BookingStatusBadge status={effectiveStatus(b)} />
                 </div>
               </div>
 
@@ -302,7 +309,7 @@ export default function ProfilePage() {
               <div className="relative flex flex-wrap items-center justify-between gap-3 border-t-2 border-dashed border-crimson/35 px-5 py-4 text-sm before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950">
                 <p className="text-wine-900/75">
                   {b.quantity} × {b.tier_name} ·{' '}
-                  <span className="font-semibold text-wine-900">{formatPrice(b.total_cents)}</span>
+                  <span className="font-semibold text-wine-900">{b.total_kzt ? formatKzt(b.total_kzt) : formatPrice(b.total_cents)}</span>
                 </p>
                 <div className="flex items-center gap-3">
                   <span className="font-mono text-xs tracking-widest text-wine-900/60">{b.booking_code}</span>
@@ -312,7 +319,7 @@ export default function ProfilePage() {
                     onClick={() => setOpenCode(open ? null : b.booking_code)}
                     className="rounded-full px-4 py-2 text-sm font-medium text-crimson ring-1 ring-crimson/35 transition hover:bg-crimson/10"
                   >
-                    {open ? 'Hide details' : tab === 'upcoming' ? 'Details and cancel' : 'Details'}
+                    {open ? 'Hide details' : effectiveStatus(b) === 'pending' ? 'Pay now' : tab === 'upcoming' ? 'Details and cancel' : 'Details'}
                   </button>
                 </div>
               </div>
