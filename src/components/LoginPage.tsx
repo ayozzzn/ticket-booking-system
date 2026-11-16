@@ -60,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="font-display text-6xl font-medium leading-none text-gold">Log in</h1>
+      <h1 className="font-display text-6xl font-bold leading-none text-gold">Log in</h1>
       <p className="mt-4 text-cream-dim">Log in to see your tickets and manage your bookings.</p>
 
       <form

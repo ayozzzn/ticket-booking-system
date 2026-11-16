@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export type Route =
   | { name: 'home' }
   | { name: 'event'; id: string }
+  | { name: 'calendar' }
   | { name: 'bookings' }
   | { name: 'admin' }
   | { name: 'register' }
@@ -20,6 +21,8 @@ function parseHash(hash: string): Route {
   switch (parts[0]) {
     case 'events':
       return parts[1] ? { name: 'event', id: parts[1] } : { name: 'home' };
+    case 'calendar':
+      return { name: 'calendar' };
     case 'bookings':
       return { name: 'bookings' };
     case 'admin':

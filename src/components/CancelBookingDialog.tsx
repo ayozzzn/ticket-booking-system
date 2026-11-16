@@ -97,7 +97,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
           </span>
         </div>
         <div>
-          <h2 id="cancel-title" className="font-display text-3xl font-semibold">
+          <h2 id="cancel-title" className="font-display text-3xl font-bold">
             {unpaid ? 'Tickets released' : 'Booking cancelled'}
           </h2>
           <p className="mt-2 text-sm text-wine-900/70">
@@ -108,7 +108,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
         {hasRefund && pay && (
           <div className="animate-fade-up rounded-2xl bg-white p-4 text-left ring-1 ring-wine-900/15">
             <p className="text-xs uppercase tracking-[0.2em] text-wine-900/50">Your refund</p>
-            <p className="mt-1 font-display text-4xl font-semibold text-emerald-700">{formatKzt(pay.refund_kzt)}</p>
+            <p className="mt-1 font-display text-4xl font-bold text-emerald-700">{formatKzt(pay.refund_kzt)}</p>
             <p className="mt-1 text-sm text-wine-900/70">
               {pay.refund_percent}% of {formatKzt(pay.amount_kzt)}, back to {describePayment(pay)}
             </p>
@@ -143,7 +143,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
     return shell(
       <div className="space-y-6 py-4 text-center" role="status" aria-live="polite">
         <Loader2 className="mx-auto h-10 w-10 animate-spin text-crimson" aria-hidden="true" />
-        <h2 id="cancel-title" className="font-display text-3xl font-semibold">Working on it...</h2>
+        <h2 id="cancel-title" className="font-display text-3xl font-bold">Working on it...</h2>
         <ul className="mx-auto max-w-xs space-y-3 text-left text-sm">
           {steps.map((label, i) => (
             <li key={label} className="animate-fade-up flex items-center gap-3" style={{ animationDelay: `${i * 350}ms` }}>
@@ -171,7 +171,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
         </button>
       </div>
 
-      <h2 id="cancel-title" className="mt-4 font-display text-3xl font-semibold text-wine-900">
+      <h2 id="cancel-title" className="mt-4 font-display text-3xl font-bold text-wine-900">
         {unpaid ? 'Release these tickets?' : 'Cancel this booking?'}
       </h2>
       <p className="mt-2 text-sm text-wine-900/75">
@@ -200,7 +200,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
           <div className="flex items-end justify-between gap-3">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-wine-900/50">You get back</p>
-              <p className={`font-display text-4xl font-semibold ${refundKzt > 0 ? 'text-emerald-700' : 'text-wine-900'}`}>{formatKzt(refundKzt)}</p>
+              <p className={`font-display text-4xl font-bold ${refundKzt > 0 ? 'text-emerald-700' : 'text-wine-900'}`}>{formatKzt(refundKzt)}</p>
             </div>
             <p className="pb-1 text-right text-xs text-wine-900/60">
               {quote.percent}% of {formatKzt(paidKzt)}
@@ -213,7 +213,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
                 const active = t.percent === quote.percent;
                 return (
                   <div key={t.percent} className={`flex-1 rounded-lg px-2 py-2 text-center transition ${active ? 'bg-crimson text-cream shadow-md' : 'bg-wine-900/5 text-wine-900/55'}`}>
-                    <p className="font-display text-xl font-semibold leading-none">{t.percent}%</p>
+                    <p className="font-display text-xl font-bold leading-none">{t.percent}%</p>
                     <p className="mt-1 text-[10px] leading-tight">{t.label}</p>
                   </div>
                 );

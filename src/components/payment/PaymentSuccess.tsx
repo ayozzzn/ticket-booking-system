@@ -42,7 +42,7 @@ export default function PaymentSuccess({ receipt, loggedIn, onDone }: PaymentSuc
       </div>
 
       <div className="animate-fade-up">
-        <h3 className="font-display text-4xl font-semibold text-wine-900">{free ? 'You are in!' : 'Payment received'}</h3>
+        <h3 className="font-display text-4xl font-bold text-wine-900">{free ? 'You are in!' : 'Payment received'}</h3>
         <p className="mt-2 text-sm text-wine-900/70">
           {free ? 'Your free tickets are confirmed.' : 'Thank you! Your tickets are confirmed.'}{' '}
           A copy is saved under your booking code.
@@ -53,7 +53,7 @@ export default function PaymentSuccess({ receipt, loggedIn, onDone }: PaymentSuc
       <div className="animate-fade-up overflow-hidden rounded-2xl bg-white text-left shadow-xl shadow-wine-900/15 ring-1 ring-wine-900/10 [animation-delay:0.15s]">
         <div className="bg-gradient-to-r from-crimson to-wine-800 px-5 py-4 text-cream">
           <p className="text-[10px] uppercase tracking-[0.25em] text-cream/70">Kesh · admit {receipt.quantity}</p>
-          <p className="mt-1 font-display text-2xl font-semibold leading-tight">{receipt.event_title}</p>
+          <p className="mt-1 font-display text-2xl font-bold leading-tight">{receipt.event_title}</p>
           <p className="text-sm text-cream/80">{receipt.tier_name}</p>
         </div>
         <div className="relative grid gap-4 border-t-2 border-dashed border-crimson/35 p-5 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-cream after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-cream sm:grid-cols-[1fr_auto]">

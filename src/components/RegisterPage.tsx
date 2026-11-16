@@ -92,7 +92,7 @@ export default function RegisterPage() {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <div className="rounded-3xl bg-cream p-8 text-center text-wine-900 shadow-xl shadow-black/40">
-          <h1 className="font-display text-4xl font-semibold text-wine-900">Check your email</h1>
+          <h1 className="font-display text-4xl font-bold text-wine-900">Check your email</h1>
           <p className="mt-3 text-wine-900/75">
             We sent a confirmation link to <span className="font-semibold text-wine-900">{email.trim()}</span>.
             Open it, then log in. If it is not there in a minute, check the spam folder.
@@ -124,7 +124,7 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="font-display text-6xl font-medium leading-none text-gold">Create an account</h1>
+      <h1 className="font-display text-6xl font-bold leading-none text-gold">Create an account</h1>
       <p className="mt-4 text-cream-dim">
         With an account all your tickets are in one place and you can cancel them there. Registration is
         optional: you can still book without it.

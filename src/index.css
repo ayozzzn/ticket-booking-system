@@ -9,6 +9,12 @@
 }
 
 @layer components {
+  /* Playfair has old-style digits by default; headings with prices and timers need lining ones */
+  .font-display {
+    font-variant-numeric: lining-nums;
+    letter-spacing: -0.005em;
+  }
+
   .kesh-bg {
     background:
       radial-gradient(900px 500px at 85% -5%, rgba(155, 28, 44, 0.55), transparent 70%),

@@ -117,7 +117,7 @@ export default function PaymentFlow({ receipt: initial, onPaid, onExpired, onDon
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100 text-red-700">
           <TimerOff className="h-8 w-8" aria-hidden="true" />
         </span>
-        <h3 className="font-display text-3xl font-semibold text-wine-900">Time is up</h3>
+        <h3 className="font-display text-3xl font-bold text-wine-900">Time is up</h3>
         <p className="mx-auto max-w-sm text-sm text-wine-900/70">
           The tickets were released so other people can buy them. No money was taken. You can choose your tickets again.
         </p>
@@ -142,7 +142,7 @@ export default function PaymentFlow({ receipt: initial, onPaid, onExpired, onDon
             <p className="mt-1 truncate font-medium">{receipt.event_title}</p>
             <p className="text-sm text-cream/70">{receipt.quantity} × {receipt.tier_name}</p>
           </div>
-          <p className="shrink-0 font-display text-4xl font-semibold text-gold">{formatKzt(total)}</p>
+          <p className="shrink-0 font-display text-4xl font-bold text-gold">{formatKzt(total)}</p>
         </div>
       </div>
 

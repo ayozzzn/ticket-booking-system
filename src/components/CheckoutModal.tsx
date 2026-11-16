@@ -140,7 +140,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-crimson">{event.title}</p>
-            <h2 id="checkout-title" className="mt-1 font-display text-3xl font-semibold text-wine-900">
+            <h2 id="checkout-title" className="mt-1 font-display text-3xl font-bold text-wine-900">
               {`${tier.name} tickets`}
             </h2>
           </div>
@@ -223,10 +223,36 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
               : 'Use the same email later to find or cancel your booking.'}
           </p>
 
+<<<<<<< HEAD
           {formError && (
             <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <span>{formError}</span>
+=======
+            {formError && (
+              <div role="alert" className="flex items-start gap-3 rounded-xl bg-red-50 p-4 text-sm text-red-800 ring-1 ring-red-200">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{formError}</span>
+              </div>
+            )}
+
+            <div className="border-t-2 border-dashed border-crimson/35 pt-5">
+              <div className="flex items-end justify-between gap-4">
+                <span className="pb-1 text-wine-900/70">Total</span>
+                <div className="text-right">
+                  <span className="block font-display text-4xl font-bold text-wine-900">
+                    {free ? 'Free' : rate ? formatKzt(centsToKzt(total, rate)) : formatPrice(total)}
+                  </span>
+                  {!free && rate && <span className="text-xs text-wine-900/55">{formatPrice(total)} at 1 $ = {rate} ₸</span>}
+                </div>
+              </div>
+              {!free && (
+                <p className="mt-3 flex items-start gap-2 rounded-xl bg-wine-900/5 p-3 text-xs text-wine-900/70">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  Next you pay by card, Kaspi QR or Halyk QR. We hold your tickets for 10 minutes while you pay.
+                </p>
+              )}
+>>>>>>> 4d56a92 (add events calendar)
             </div>
           )}
 

@@ -56,7 +56,7 @@ export default function EventCatalog() {
           <p className="animate-fade-up text-base font-medium text-cream-dim">
             Live events, reserved in seconds
           </p>
-          <h1 className="animate-fade-up mt-4 max-w-4xl font-display text-6xl font-medium leading-[0.95] text-gold sm:text-7xl lg:text-8xl [animation-delay:80ms]">
+          <h1 className="animate-fade-up mt-4 max-w-4xl font-display text-6xl font-bold leading-[1.05] text-gold sm:text-6xl lg:text-7xl [animation-delay:80ms]">
             Tonight is yours to book.
           </h1>
           <p className="animate-fade-up mt-6 max-w-2xl text-lg leading-relaxed text-cream-dim [animation-delay:160ms]">
@@ -133,7 +133,7 @@ export default function EventCatalog() {
 
             {visibleEvents.length === 0 ? (
               <div className="flex flex-col items-center gap-4 rounded-2xl bg-cream py-16 text-center text-wine-900">
-                <p className="font-display text-3xl font-semibold">No events match your search</p>
+                <p className="font-display text-3xl font-bold">No events match your search</p>
                 <p className="text-wine-900/75">Try a different keyword or category.</p>
                 <button
                   type="button"

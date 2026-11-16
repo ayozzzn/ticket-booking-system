@@ -124,7 +124,7 @@ export default function ProfilePage() {
     return (
       <div className="mx-auto max-w-md px-4 py-16">
         <div className="rounded-3xl bg-cream p-8 text-center text-wine-900 shadow-xl shadow-black/40">
-          <h1 className="font-display text-4xl font-semibold text-wine-900">Please log in</h1>
+          <h1 className="font-display text-4xl font-bold text-wine-900">Please log in</h1>
           <p className="mt-3 text-wine-900/75">Log in to see your tickets and manage your bookings.</p>
           <a
             href="#/login"
@@ -185,7 +185,7 @@ export default function ProfilePage() {
               </form>
             ) : (
               <>
-                <h1 className="truncate font-display text-3xl font-semibold text-wine-900">{displayName}</h1>
+                <h1 className="truncate font-display text-3xl font-bold text-wine-900">{displayName}</h1>
                 <p className="truncate text-sm text-wine-900/70">{user.email}</p>
                 <button
                   type="button"
@@ -212,7 +212,7 @@ export default function ProfilePage() {
         </button>
       </section>
 
-      <h2 className="mt-10 font-display text-4xl font-medium text-gold">My tickets</h2>
+      <h2 className="mt-10 font-display text-4xl font-bold text-gold">My tickets</h2>
 
       <div className="mt-4 flex flex-wrap gap-2" role="tablist" aria-label="Booking status">
         {(Object.keys(TAB_LABELS) as TabId[]).map((id) => {
@@ -289,7 +289,7 @@ export default function ProfilePage() {
               <div className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h3 className="font-display text-2xl font-semibold text-crimson">{b.event_title}</h3>
+                    <h3 className="font-display text-2xl font-bold text-crimson">{b.event_title}</h3>
                     <p className="mt-1 flex items-center gap-2 text-sm text-wine-900/75">
                       <CalendarDays className="h-4 w-4 shrink-0" aria-hidden="true" />
                       {formatEventDate(b.event_starts_at)} · {formatEventTime(b.event_starts_at)}

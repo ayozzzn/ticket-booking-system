@@ -327,7 +327,7 @@ function OtpStep({ payment, owner, last4, testOtp, onPaid, onDeclined, onBack }:
         <MessageSquareText className="h-8 w-8" aria-hidden="true" />
       </div>
       <div>
-        <h3 className="font-display text-3xl font-semibold text-wine-900">Confirm with your bank</h3>
+        <h3 className="font-display text-3xl font-bold text-wine-900">Confirm with your bank</h3>
         <p className="mt-2 text-sm text-wine-900/70">
           We asked your bank to send an SMS code for the card ending <span className="font-mono font-semibold">{last4}</span>.
           Enter the 6 digits below.

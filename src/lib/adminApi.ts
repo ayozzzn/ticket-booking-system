@@ -45,10 +45,15 @@ export async function loadAdminBookings(): Promise<AdminBooking[]> {
   return (data ?? []) as unknown as AdminBooking[];
 }
 
-export async function saveEvent(input: Omit<AdminEvent, 'id' | 'ticket_tiers'>, id?: string) {
-  const query = id ? supabase.from('events').update(input).eq('id', id) : supabase.from('events').insert(input);
-  const { error } = await query;
+export async function saveEvent(input: Omit<AdminEvent, 'id' | 'ticket_tiers'>, id?: string): Promise<string> {
+  if (id) {
+    const { error } = await supabase.from('events').update(input).eq('id', id);
+    if (error) throw error;
+    return id;
+  }
+  const { data, error } = await supabase.from('events').insert(input).select('id').single();
   if (error) throw error;
+  return data.id as string;
 }
 
 export async function removeEvent(id: string) {

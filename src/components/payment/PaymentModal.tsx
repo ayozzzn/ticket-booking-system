@@ -43,7 +43,7 @@ export default function PaymentModal({ receipt, onClose, onPaid, onExpired }: Pa
               <Lock className="h-4 w-4" aria-hidden="true" />
               Secure payment · KZT
             </p>
-            <h2 id="payment-title" className="mt-1 font-display text-3xl font-semibold text-wine-900">Checkout</h2>
+            <h2 id="payment-title" className="mt-1 font-display text-3xl font-bold text-wine-900">Checkout</h2>
           </div>
           <button
             type="button"

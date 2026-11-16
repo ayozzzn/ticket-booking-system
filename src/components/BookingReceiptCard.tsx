@@ -94,7 +94,7 @@ export default function BookingReceiptCard({ receipt }: BookingReceiptCardProps)
         </p>
         {dead && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-hidden="true">
-            <span className="animate-stamp rounded-md border-4 border-red-600/70 bg-white/60 px-4 py-1 font-display text-2xl font-semibold uppercase tracking-widest text-red-600/80">
+            <span className="animate-stamp rounded-md border-4 border-red-600/70 bg-white/60 px-4 py-1 font-display text-2xl font-bold uppercase tracking-widest text-red-600/80">
               {cancelled ? 'Cancelled' : 'Expired'}
             </span>
           </div>

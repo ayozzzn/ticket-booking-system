@@ -29,7 +29,7 @@ export default {
         },
       },
       fontFamily: {
-        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        display: ['"Playfair Display"', 'Georgia', 'serif'],
         sans: ['"DM Sans"', 'system-ui', 'sans-serif'],
       },
       keyframes: {

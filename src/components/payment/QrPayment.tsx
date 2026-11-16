@@ -98,7 +98,7 @@ export default function QrPayment({ payment, owner, payload, config, onPaid, onF
               </span>
             </div>
           </div>
-          <p className="mt-3 text-center font-display text-3xl font-semibold text-wine-900">{formatKzt(payment.amount_kzt)}</p>
+          <p className="mt-3 text-center font-display text-3xl font-bold text-wine-900">{formatKzt(payment.amount_kzt)}</p>
           <p className="mt-1 flex items-center justify-center gap-2 text-xs text-wine-900/60" role="status">
             <span className="relative flex h-2.5 w-2.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-crimson opacity-60" />
@@ -109,7 +109,7 @@ export default function QrPayment({ payment, owner, payload, config, onPaid, onF
         </div>
 
         <div className="space-y-4">
-          <h3 className="flex items-center gap-2 font-display text-2xl font-semibold text-wine-900">
+          <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-wine-900">
             <span className="h-3 w-3 rounded-full" style={{ backgroundColor: bank.accent }} aria-hidden="true" />
             Pay with {bank.name} QR
           </h3>
@@ -155,8 +155,8 @@ export default function QrPayment({ payment, owner, payload, config, onPaid, onF
               </div>
               <div className="space-y-3 px-5 py-4 text-center">
                 <p className="text-xs text-wine-900/60">Pay to</p>
-                <p className="font-display text-2xl font-semibold">Kesh Tickets</p>
-                <p className="font-display text-4xl font-semibold text-crimson">{formatKzt(payment.amount_kzt)}</p>
+                <p className="font-display text-2xl font-bold">Kesh Tickets</p>
+                <p className="font-display text-4xl font-bold text-crimson">{formatKzt(payment.amount_kzt)}</p>
                 <p className="text-[11px] text-wine-900/55">From: Gold card •••• 7788</p>
 
                 {error && (

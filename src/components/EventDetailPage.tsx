@@ -57,7 +57,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
       {(status === 'error' || status === 'missing') && (
         <div className="mx-auto mt-16 flex max-w-md flex-col items-center gap-4 rounded-2xl bg-cream p-8 text-center text-wine-900">
           <AlertCircle className="h-8 w-8 text-crimson" aria-hidden="true" />
-          <p className="font-display text-3xl font-semibold">
+          <p className="font-display text-3xl font-bold">
             {status === 'missing' ? 'We could not find that event' : 'Something went wrong'}
           </p>
           <p className="text-wine-900/75">
@@ -86,7 +86,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
               <span className="w-fit rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson">
                 {event.category}
               </span>
-              <h1 className="mt-5 font-display text-5xl font-medium leading-[0.98] text-gold sm:text-6xl">
+              <h1 className="mt-5 font-display text-5xl font-bold leading-[1.08] text-gold sm:text-6xl">
                 {event.title}
               </h1>
 
@@ -106,7 +106,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
           </div>
 
           <section className="mt-16" aria-labelledby="tickets-heading">
-            <h2 id="tickets-heading" className="font-display text-4xl font-medium text-gold">
+            <h2 id="tickets-heading" className="font-display text-4xl font-bold text-gold">
               Choose your tickets
             </h2>
             <p className="mt-2 text-cream-dim">Select a ticket type to continue to checkout.</p>
@@ -122,7 +122,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                     className="overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40"
                   >
                     <div className="p-5 sm:p-6">
-                      <h3 className="font-display text-2xl font-semibold text-crimson">{tier.name}</h3>
+                      <h3 className="font-display text-2xl font-bold text-crimson">{tier.name}</h3>
                       <p className="mt-1 text-sm text-wine-900/75">{tier.description}</p>
                       <p
                         className={`mt-2 text-sm font-semibold ${
@@ -135,7 +135,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
 
                     {/* Ticket stub */}
                     <div className="relative flex items-center justify-between gap-6 border-t-2 border-dashed border-crimson/35 px-5 py-4 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950 sm:px-6">
-                      <p className="font-display text-3xl font-semibold text-wine-900">
+                      <p className="font-display text-3xl font-bold text-wine-900">
                         {formatPrice(tier.price_cents)}
                         {rate && tier.price_cents > 0 && (
                           <span className="ml-3 font-sans text-sm font-medium text-wine-900/55">≈ {formatKzt(centsToKzt(tier.price_cents, rate))}</span>

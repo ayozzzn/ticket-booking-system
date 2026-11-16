@@ -5,6 +5,7 @@ import BookingLookupPage from '@/components/BookingLookupPage';
 import RegisterPage from '@/components/RegisterPage';
 import LoginPage from '@/components/LoginPage';
 import ProfilePage from '@/components/ProfilePage';
+import EventCalendarPage from '@/components/EventCalendarPage';
 import VersionBadge from '@/components/VersionBadge';
 import { useRoute } from '@/hooks/useRoute';
 import AdminPanel from '@/components/admin/AdminPanel';
@@ -19,6 +20,7 @@ function App() {
       <main className="flex-1">
         {route.name === 'home' && <EventCatalog />}
         {route.name === 'event' && <EventDetailPage key={route.id} eventId={route.id} />}
+        {route.name === 'calendar' && <EventCalendarPage />}
         {route.name === 'bookings' && <BookingLookupPage />}
         {route.name === 'admin' && (
           <div className="min-h-[70vh] bg-[#f8efe8] text-stone-900">
@@ -32,7 +34,7 @@ function App() {
 
       <footer className="border-t border-gold/20 bg-wine-950">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-cream-dim sm:flex-row sm:px-6 lg:px-8">
-          <span className="font-display text-2xl font-semibold text-cream">Kesh</span>
+          <span className="font-display text-2xl font-bold text-cream">Kesh</span>
           <span>Tickets are held for 10 minutes while you pay. Keep your booking code safe.</span>
           <VersionBadge />
         </div>
