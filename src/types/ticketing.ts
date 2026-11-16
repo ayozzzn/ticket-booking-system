@@ -6,6 +6,16 @@ export interface TicketTier {
   price_cents: number;
   capacity: number;
   sold: number;
+  /** 'reserved' = the customer picks seats on a seat map. Missing = 'general'. */
+  seating?: 'general' | 'reserved';
+}
+
+export interface Seat {
+  id: string;
+  row: string; // "A", "B", ... "AA"
+  row_no: number;
+  seat: number; // 1, 2, 3 ... inside the row
+  taken: boolean;
 }
 
 export interface EventRecord {
@@ -63,4 +73,6 @@ export interface BookingReceipt {
   payment?: PaymentInfo | null;
   /** What a cancellation would refund right now (paid bookings only). */
   refund_quote?: { percent: number; kzt: number } | null;
+  /** Seats of a reserved-seating booking, e.g. ["C7", "C8"]. Empty or missing for general admission. */
+  seat_labels?: string[] | null;
 }

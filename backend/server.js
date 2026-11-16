@@ -89,6 +89,32 @@ app.post('/api/bookings', limited, asyncRoute(async (req, res) => {
   if (error) return sendError(res, error);
   res.status(201).json(data);
 }));
+// Seat map of a reserved-seating ticket type (no personal data, only which seats are taken).
+app.get('/api/tiers/:id/seats', asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid ticket type ID' });
+  const { data, error } = await db.rpc('get_tier_seats', { p_tier_id: req.params.id });
+  if (error) return sendError(res, error);
+  res.json(data ?? []);
+}));
+// Booking with chosen seats. Like /api/bookings it is "pending": the seats are held while the customer pays.
+app.post('/api/bookings/seats', limited, asyncRoute(async (req, res) => {
+  const { tierId, seatIds, customerName, customerEmail } = req.body ?? {};
+  const seatsOk = Array.isArray(seatIds) && seatIds.length >= 1 && seatIds.length <= 10
+    && seatIds.every(uuidOk) && new Set(seatIds).size === seatIds.length;
+  if (!uuidOk(tierId) || !seatsOk || !isText(customerName, 120) || !emailOk(customerEmail)) {
+    return res.status(400).json({ error: 'Invalid booking input' });
+  }
+  const token = bearer(req);
+  if (token) {
+    const { data: userData } = await db.auth.getUser(token);
+    if (!userData?.user) return res.status(401).json({ error: 'Invalid session' });
+  }
+  const { data, error } = await clientFor(token).rpc('create_booking_with_seats', {
+    p_tier_id: tierId, p_seat_ids: seatIds, p_customer_name: customerName.trim(), p_customer_email: customerEmail.trim()
+  });
+  if (error) return sendError(res, error);
+  res.status(201).json(data);
+}));
 app.post('/api/bookings/lookup', limited, asyncRoute(async (req, res) => {
   const { code, email } = req.body ?? {};
   if (!isText(code, 60) || !emailOk(email)) return res.status(400).json({ error: 'Invalid lookup input' });

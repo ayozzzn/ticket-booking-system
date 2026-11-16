@@ -27,6 +27,9 @@ export default function BookingReceiptCard({ receipt }: BookingReceiptCardProps)
     { label: 'Venue', value: `${receipt.event_venue}, ${receipt.event_city}` },
     { label: 'Ticket type', value: receipt.tier_name },
     { label: 'Tickets', value: String(receipt.quantity) },
+    ...(receipt.seat_labels && receipt.seat_labels.length > 0
+      ? [{ label: 'Seats', value: receipt.seat_labels.join(', ') }]
+      : []),
     { label: 'Total', value: dead && !pay?.refund_kzt ? <s className="text-wine-900/40">{total}</s> : total },
   ];
   if (pay && pay.status === 'paid') {

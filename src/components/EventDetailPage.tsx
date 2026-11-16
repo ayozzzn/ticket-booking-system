@@ -144,7 +144,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                         onClick={() => setSelectedTier(tier)}
                         className="rounded-full bg-crimson px-6 py-2.5 text-sm font-semibold text-cream shadow-sm transition hover:-translate-y-0.5 hover:bg-crimson-bright hover:shadow-md disabled:cursor-not-allowed disabled:bg-wine-900/15 disabled:text-wine-900/50 disabled:shadow-none disabled:hover:translate-y-0"
                       >
-                        {soldOut ? 'Unavailable' : 'Select'}
+                        {soldOut ? 'Unavailable' : tier.seating === 'reserved' ? 'Choose seats' : 'Select'}
                       </button>
                     </div>
                   </li>

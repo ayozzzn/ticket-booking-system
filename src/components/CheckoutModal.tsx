@@ -2,9 +2,10 @@ import { AlertCircle, Clock, Loader2, Minus, Plus, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
 import FormField from '@/components/FormField';
 import PaymentModal from '@/components/payment/PaymentModal';
+import SeatPicker from '@/components/SeatPicker';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { useSession } from '@/hooks/useSession';
-import { createBooking } from '@/lib/bookingApi';
+import { createBooking, createSeatBooking } from '@/lib/bookingApi';
 import { formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
 import type { BookingReceipt, EventRecord, TicketTier } from '@/types/ticketing';
 
@@ -22,7 +23,11 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
   const { session } = useSession();
   const rate = useExchangeRate();
   const maxQuantity = Math.min(MAX_TICKETS_PER_BOOKING, ticketsRemaining(tier));
+  // Reserved seating: the customer picks seats on a map instead of a quantity.
+  const reserved = tier.seating === 'reserved';
   const [quantity, setQuantity] = useState(1);
+  const [seatIds, setSeatIds] = useState<string[]>([]);
+  const [seatMapVersion, setSeatMapVersion] = useState(0);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -53,6 +58,10 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
     e.preventDefault();
     setFormError('');
 
+    if (reserved && seatIds.length === 0) {
+      setFormError('Please choose at least one seat.');
+      return;
+    }
     if (!name.trim()) {
       setFormError('Please enter your name.');
       return;
@@ -64,22 +73,24 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
 
     setSubmitting(true);
     try {
-      const result = await createBooking({
-        tierId: tier.id,
-        quantity,
-        customerName: name.trim(),
-        customerEmail: email.trim(),
-      });
+      const customer = { tierId: tier.id, customerName: name.trim(), customerEmail: email.trim() };
+      const result = reserved
+        ? await createSeatBooking({ ...customer, seatIds })
+        : await createBooking({ ...customer, quantity });
       setReceipt(result); // "pending": the tickets are held, payment comes next
       onBooked();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Your booking could not be completed.');
+      const message = err instanceof Error ? err.message : 'Your booking could not be completed.';
+      setFormError(message);
+      // Somebody else took a seat first: reload the map so the customer sees what is still free.
+      if (reserved && /seat/i.test(message)) setSeatMapVersion((v) => v + 1);
     } finally {
       setSubmitting(false);
     }
   }
 
-  const total = tier.price_cents * quantity;
+  const ticketCount = reserved ? seatIds.length : quantity;
+  const total = tier.price_cents * ticketCount;
   const free = tier.price_cents === 0;
 
   if (receipt) {
@@ -114,7 +125,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         role="dialog"
         aria-modal="true"
         aria-labelledby="checkout-title"
-        className="animate-modal-in max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-cream p-6 text-wine-900 shadow-2xl sm:p-8"
+        className={`animate-modal-in max-h-[90vh] w-full overflow-y-auto ${reserved ? 'max-w-2xl' : 'max-w-lg'} rounded-3xl bg-cream p-6 text-wine-900 shadow-2xl sm:p-8`}
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -135,37 +146,47 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
-            <div className="flex items-center justify-between rounded-2xl bg-white/60 p-4 ring-1 ring-wine-900/15">
-              <div>
-                <p className="font-medium text-wine-900">Number of tickets</p>
-                <p className="text-sm text-wine-900/70">
-                  {free ? 'Free' : formatPrice(tier.price_cents)} each · up to {maxQuantity} available
-                </p>
+            {reserved ? (
+              <SeatPicker
+                tier={tier}
+                maxSeats={maxQuantity}
+                selectedIds={seatIds}
+                onChange={setSeatIds}
+                reloadKey={seatMapVersion}
+              />
+            ) : (
+              <div className="flex items-center justify-between rounded-2xl bg-white/60 p-4 ring-1 ring-wine-900/15">
+                <div>
+                  <p className="font-medium text-wine-900">Number of tickets</p>
+                  <p className="text-sm text-wine-900/70">
+                    {free ? 'Free' : formatPrice(tier.price_cents)} each · up to {maxQuantity} available
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    aria-label="Remove one ticket"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    disabled={quantity <= 1 || submitting}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
+                  >
+                    <Minus className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                  <span className="w-6 text-center text-lg font-semibold tabular-nums text-wine-900" aria-live="polite">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    aria-label="Add one ticket"
+                    onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
+                    disabled={quantity >= maxQuantity || submitting}
+                    className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
+                  >
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  aria-label="Remove one ticket"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  disabled={quantity <= 1 || submitting}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
-                >
-                  <Minus className="h-4 w-4" aria-hidden="true" />
-                </button>
-                <span className="w-6 text-center text-lg font-semibold tabular-nums text-wine-900" aria-live="polite">
-                  {quantity}
-                </span>
-                <button
-                  type="button"
-                  aria-label="Add one ticket"
-                  onClick={() => setQuantity((q) => Math.min(maxQuantity, q + 1))}
-                  disabled={quantity >= maxQuantity || submitting}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-wine-900 ring-1 ring-wine-900/25 transition hover:bg-crimson hover:text-cream disabled:opacity-40 disabled:hover:bg-white disabled:hover:text-wine-900"
-                >
-                  <Plus className="h-4 w-4" aria-hidden="true" />
-                </button>
-              </div>
-            </div>
+            )}
 
             <FormField
               id="customer-name"
@@ -201,29 +222,37 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
 
             <div className="border-t-2 border-dashed border-crimson/35 pt-5">
               <div className="flex items-end justify-between gap-4">
-                <span className="pb-1 text-wine-900/70">Total</span>
+                <span className="pb-1 text-wine-900/70">
+                  Total{reserved && ` · ${ticketCount} ${ticketCount === 1 ? 'seat' : 'seats'}`}
+                </span>
                 <div className="text-right">
                   <span className="block font-display text-4xl font-bold text-wine-900">
-                    {free ? 'Free' : rate ? formatKzt(centsToKzt(total, rate)) : formatPrice(total)}
+                    {reserved && ticketCount === 0 ? '—' : free ? 'Free' : rate ? formatKzt(centsToKzt(total, rate)) : formatPrice(total)}
                   </span>
-                  {!free && rate && <span className="text-xs text-wine-900/55">{formatPrice(total)} at 1 $ = {rate} ₸</span>}
+                  {!free && rate && ticketCount > 0 && <span className="text-xs text-wine-900/55">{formatPrice(total)} at 1 $ = {rate} ₸</span>}
                 </div>
               </div>
               {!free && (
                 <p className="mt-3 flex items-start gap-2 rounded-xl bg-wine-900/5 p-3 text-xs text-wine-900/70">
                   <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                  Next you pay by card, Kaspi QR or Halyk QR. We hold your tickets for 10 minutes while you pay.
+                  Next you pay by card, Kaspi QR or Halyk QR. We hold your {reserved ? 'seats' : 'tickets'} for 10 minutes while you pay.
                 </p>
               )}
             </div>
 
             <button
               type="submit"
-              disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-crimson py-3.5 font-semibold text-cream shadow-sm transition hover:bg-crimson-bright hover:shadow-md disabled:cursor-wait disabled:opacity-70"
+              disabled={submitting || (reserved && seatIds.length === 0)}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-crimson py-3.5 font-semibold text-cream shadow-sm transition hover:bg-crimson-bright hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-              {submitting ? 'Reserving your tickets...' : free ? 'Confirm free booking' : 'Continue to payment'}
+              {submitting
+                ? 'Reserving your tickets...'
+                : reserved && seatIds.length === 0
+                  ? 'Choose your seats'
+                  : free
+                    ? 'Confirm free booking'
+                    : 'Continue to payment'}
             </button>
         </form>
       </div>

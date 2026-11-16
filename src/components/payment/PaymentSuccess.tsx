@@ -54,7 +54,10 @@ export default function PaymentSuccess({ receipt, loggedIn, onDone }: PaymentSuc
         <div className="bg-gradient-to-r from-crimson to-wine-800 px-5 py-4 text-cream">
           <p className="text-[10px] uppercase tracking-[0.25em] text-cream/70">Kesh · admit {receipt.quantity}</p>
           <p className="mt-1 font-display text-2xl font-bold leading-tight">{receipt.event_title}</p>
-          <p className="text-sm text-cream/80">{receipt.tier_name}</p>
+          <p className="text-sm text-cream/80">
+            {receipt.tier_name}
+            {receipt.seat_labels && receipt.seat_labels.length > 0 && ` · Seats ${receipt.seat_labels.join(', ')}`}
+          </p>
         </div>
         <div className="relative grid gap-4 border-t-2 border-dashed border-crimson/35 p-5 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-cream after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-cream sm:grid-cols-[1fr_auto]">
           <div className="space-y-2 text-sm text-wine-900">

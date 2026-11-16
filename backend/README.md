@@ -25,6 +25,8 @@ If PowerShell blocks npm scripts, use `npm.cmd install` and `npm.cmd run dev`.
 | GET | `/api/health` | none |
 | GET | `/api/events` | none |
 | GET | `/api/events/:id` | UUID |
+| GET | `/api/tiers/:id/seats` | none (seat map of a reserved-seating ticket type) |
+| POST | `/api/bookings/seats` | `{ "tierId": "UUID", "seatIds": ["UUID"], "customerName": "...", "customerEmail": "..." }` (pending, then pay) |
 | POST | `/api/bookings` | `{ "tierId": "UUID", "quantity": 1, "customerName": "Test User", "customerEmail": "test@example.com" }` |
 | POST | `/api/bookings/lookup` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
 | POST | `/api/bookings/cancel` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
