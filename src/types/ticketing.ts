@@ -6,6 +6,16 @@ export interface TicketTier {
   price_cents: number;
   capacity: number;
   sold: number;
+  /** 'reserved' = the customer picks seats on a seat map. Missing = 'general'. */
+  seating?: 'general' | 'reserved';
+}
+
+export interface Seat {
+  id: string;
+  row: string; // "A", "B", ... "AA"
+  row_no: number;
+  seat: number; // 1, 2, 3 ... inside the row
+  taken: boolean;
 }
 
 export interface EventRecord {
@@ -35,4 +45,6 @@ export interface BookingReceipt {
   tier_name: string;
   status: 'confirmed' | 'cancelled' | null;
   cancelled_at: string | null;
+  /** Seats of a reserved-seating booking, e.g. ["C7", "C8"]. Empty/missing for general admission. */
+  seat_labels?: string[] | null;
 }

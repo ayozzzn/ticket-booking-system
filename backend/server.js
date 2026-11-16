@@ -20,7 +20,13 @@ app.use('/api', rateLimit({ windowMs: 15 * 60 * 1000, limit: 120, standardHeader
 const limited = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-7', legacyHeaders: false });
 const sendError = (res, error) => {
   console.error('Supabase request failed:', error?.message);
-  res.status(400).json({ error: 'Request failed. Check input or permissions.' });
+  // Messages raised by our own SQL functions (RAISE EXCEPTION -> code P0001) are written for
+  // customers ("This event has already started.", "Some of these seats were just taken...").
+  // Everything else stays generic so internal details never leak.
+  const message = error?.code === 'P0001' && error.message
+    ? error.message
+    : 'Request failed. Check input or permissions.';
+  res.status(400).json({ error: message });
 };
 const isText = (v, max = 200) => typeof v === 'string' && v.trim().length > 0 && v.length <= max;
 const emailOk = v => isText(v, 254) && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -65,6 +71,25 @@ app.post('/api/bookings/cancel', limited, asyncRoute(async (req, res) => {
   const { data, error } = await db.rpc('cancel_booking', { p_code: code, p_email: email });
   if (error) return sendError(res, error);
   res.json(data);
+}));
+app.get('/api/tiers/:id/seats', asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid ticket type ID' });
+  const { data, error } = await db.rpc('get_tier_seats', { p_tier_id: req.params.id });
+  if (error) return sendError(res, error);
+  res.json(data ?? []);
+}));
+app.post('/api/bookings/seats', limited, asyncRoute(async (req, res) => {
+  const { tierId, seatIds, customerName, customerEmail } = req.body ?? {};
+  const seatsOk = Array.isArray(seatIds) && seatIds.length >= 1 && seatIds.length <= 10
+    && seatIds.every(uuidOk) && new Set(seatIds).size === seatIds.length;
+  if (!uuidOk(tierId) || !seatsOk || !isText(customerName, 120) || !emailOk(customerEmail)) {
+    return res.status(400).json({ error: 'Invalid booking input' });
+  }
+  const { data, error } = await db.rpc('create_booking_with_seats', {
+    p_tier_id: tierId, p_seat_ids: seatIds, p_customer_name: customerName.trim(), p_customer_email: customerEmail.trim()
+  });
+  if (error) return sendError(res, error);
+  res.status(201).json(data);
 }));
 app.get('/api/bookings/my', asyncRoute(async (req, res) => {
   const token = req.headers.authorization?.match(/^Bearer (.+)$/i)?.[1];
