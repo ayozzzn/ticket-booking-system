@@ -1,5 +1,5 @@
 import { apiRequest } from '@/lib/apiClient';
-import type { BookingReceipt, EventRecord } from '@/types/ticketing';
+import type { BookingReceipt, EventRecord, Seat } from '@/types/ticketing';
 
 const EVENT_SELECT = '*, ticket_tiers(*)';
 
@@ -37,6 +37,26 @@ export async function createBooking(input: CreateBookingInput): Promise<BookingR
   const data = await apiRequest<unknown>('/api/bookings', {
     method: 'POST', body: JSON.stringify(input),
   }, 'optional'); // logged-in customers get the booking linked to their account
+  if (!isBookingReceipt(data)) throw new Error('Invalid booking confirmation from backend.');
+  return data;
+}
+
+export async function fetchTierSeats(tierId: string): Promise<Seat[]> {
+  const data = await apiRequest<unknown>(`/api/tiers/${encodeURIComponent(tierId)}/seats`);
+  return Array.isArray(data) ? (data as Seat[]) : [];
+}
+
+interface CreateSeatBookingInput {
+  tierId: string;
+  seatIds: string[];
+  customerName: string;
+  customerEmail: string;
+}
+
+export async function createSeatBooking(input: CreateSeatBookingInput): Promise<BookingReceipt> {
+  const data = await apiRequest<unknown>('/api/bookings/seats', {
+    method: 'POST', body: JSON.stringify(input),
+  });
   if (!isBookingReceipt(data)) throw new Error('Invalid booking confirmation from backend.');
   return data;
 }
