@@ -1,6 +1,7 @@
 import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
 import EventImage from '@/components/EventImage';
-import { formatEventDate, formatEventTime, formatPrice, ticketsRemaining } from '@/lib/format';
+import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
+import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
 import type { EventRecord } from '@/types/ticketing';
 
 interface EventCardProps {
@@ -8,6 +9,7 @@ interface EventCardProps {
 }
 
 export default function EventCard({ event }: EventCardProps) {
+  const rate = useExchangeRate();
   const remaining = event.ticket_tiers.reduce((sum, tier) => sum + ticketsRemaining(tier), 0);
   const capacity = event.ticket_tiers.reduce((sum, tier) => sum + tier.capacity, 0);
   const startingPrice =
@@ -51,7 +53,7 @@ export default function EventCard({ event }: EventCardProps) {
         <div>
           <p className="text-xs text-wine-900/60">From</p>
           <p className="font-display text-2xl font-bold text-wine-900">
-            {startingPrice !== null ? formatPrice(startingPrice) : 'TBA'}
+            {startingPrice === null ? 'TBA' : startingPrice === 0 ? 'Free' : rate ? formatKzt(centsToKzt(startingPrice, rate)) : formatPrice(startingPrice)}
           </p>
         </div>
         <div className="flex items-center gap-2">

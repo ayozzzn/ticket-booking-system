@@ -136,10 +136,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                     {/* Ticket stub */}
                     <div className="relative flex items-center justify-between gap-6 border-t-2 border-dashed border-crimson/35 px-5 py-4 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950 sm:px-6">
                       <p className="font-display text-3xl font-bold text-wine-900">
-                        {formatPrice(tier.price_cents)}
-                        {rate && tier.price_cents > 0 && (
-                          <span className="ml-3 font-sans text-sm font-medium text-wine-900/55">≈ {formatKzt(centsToKzt(tier.price_cents, rate))}</span>
-                        )}
+                        {tier.price_cents === 0 ? 'Free' : rate ? formatKzt(centsToKzt(tier.price_cents, rate)) : formatPrice(tier.price_cents)}
                       </p>
                       <button
                         type="button"
@@ -147,7 +144,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                         onClick={() => setSelectedTier(tier)}
                         className="rounded-full bg-crimson px-6 py-2.5 text-sm font-semibold text-cream shadow-sm transition hover:-translate-y-0.5 hover:bg-crimson-bright hover:shadow-md disabled:cursor-not-allowed disabled:bg-wine-900/15 disabled:text-wine-900/50 disabled:shadow-none disabled:hover:translate-y-0"
                       >
-                        {soldOut ? 'Unavailable' : tier.seating === 'reserved' ? 'Choose seats' : 'Select'}
+                        {soldOut ? 'Unavailable' : 'Select'}
                       </button>
                     </div>
                   </li>

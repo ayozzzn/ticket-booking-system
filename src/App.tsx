@@ -30,10 +30,15 @@ function App() {
         {route.name === 'profile' && <ProfilePage />}
       </main>
 
-      <footer className="border-t border-gold/20 bg-wine-950">
-        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm text-cream-dim sm:flex-row sm:px-6 lg:px-8">
+      <footer className="mt-16 border-t border-gold/20 bg-wine-950 text-cream-dim">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 py-8 text-sm sm:flex-row sm:px-6 lg:px-8">
           <span className="font-display text-2xl font-bold text-cream">Kesh</span>
-          <span>Tickets are held for 10 minutes while you pay. Keep your booking code safe.</span>
+          <span className="text-center">
+            Tickets are held for 10 minutes while you pay.{' '}
+            <a href="#/bookings" className="font-semibold text-cream underline underline-offset-2 hover:text-gold">
+              Bought without an account? Find your booking
+            </a>
+          </span>
           <VersionBadge />
         </div>
       </footer>

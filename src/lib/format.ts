@@ -24,13 +24,16 @@ export function formatEventDate(iso: string): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
+    timeZone: 'Asia/Almaty',
   });
 }
 
 export function formatEventTime(iso: string): string {
-  return new Date(iso).toLocaleTimeString('en-US', {
-    hour: 'numeric',
+  return new Date(iso).toLocaleTimeString('en-GB', {
+    hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Almaty',
   });
 }
 

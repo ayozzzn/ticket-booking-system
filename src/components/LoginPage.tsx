@@ -60,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="font-display text-6xl font-bold leading-none text-gold">Log in</h1>
+      <h1 className="font-display text-5xl font-bold leading-tight text-gold">Log in</h1>
       <p className="mt-4 text-cream-dim">Log in to see your tickets and manage your bookings.</p>
 
       <form
@@ -136,6 +136,12 @@ export default function LoginPage() {
         No account?{' '}
         <a href="#/register" className="font-medium text-gold underline">
           Sign up
+        </a>
+      </p>
+      <p className="mt-3 text-center text-sm text-cream-dim">
+        Bought a ticket without an account?{' '}
+        <a href="#/bookings" className="font-medium text-gold underline">
+          Find it by booking code
         </a>
       </p>
     </div>

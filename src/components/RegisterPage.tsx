@@ -124,7 +124,7 @@ export default function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-md px-4 py-14">
-      <h1 className="font-display text-6xl font-bold leading-none text-gold">Create an account</h1>
+      <h1 className="font-display text-5xl font-bold leading-tight text-gold">Create an account</h1>
       <p className="mt-4 text-cream-dim">
         With an account all your tickets are in one place and you can cancel them there. Registration is
         optional: you can still book without it.

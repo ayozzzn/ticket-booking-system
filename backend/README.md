@@ -28,8 +28,6 @@ If PowerShell blocks npm scripts, use `npm.cmd install` and `npm.cmd run dev`.
 | POST | `/api/bookings` | `{ "tierId": "UUID", "quantity": 1, "customerName": "Test User", "customerEmail": "test@example.com" }` |
 | POST | `/api/bookings/lookup` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
 | POST | `/api/bookings/cancel` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
-| GET | `/api/tiers/:id/seats` | none (seat map of a reserved-seating ticket type) |
-| POST | `/api/bookings/seats` | `{ "tierId": "UUID", "seatIds": ["UUID"], "customerName": "Test User", "customerEmail": "test@example.com" }` |
 | GET | `/api/bookings/my` | `Authorization: Bearer <Supabase user access token>` |
 
 **Warning:** Booking POST endpoints modify live data. Test on a test Supabase project or with designated test bookings. Cancellation uses the existing project's code+email RPC; evaluate that security model before real production use.

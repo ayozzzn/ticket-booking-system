@@ -81,29 +81,30 @@ export default function EventCatalog() {
 
   return (
     <div>
-      <section className="border-b border-gold/15">
-        <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-          <p className="animate-fade-up text-base font-medium text-cream-dim">
-            Live events, reserved in seconds
+      <section className="mx-auto max-w-6xl px-4 pt-8 sm:px-6 lg:px-8">
+        <div className="kesh-hero relative overflow-hidden rounded-[2rem] px-6 py-12 text-cream shadow-2xl shadow-crimson/25 sm:px-12 sm:py-16">
+          <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-20 h-72 w-72 rounded-full border-[28px] border-cream/10" />
+          <span aria-hidden="true" className="pointer-events-none absolute -bottom-24 right-40 h-56 w-56 rounded-full bg-cream/10" />
+          <p className="animate-fade-up relative w-fit rounded-full bg-cream/15 px-4 py-1.5 text-sm font-semibold">
+            Concerts · Cinema · Theatre · Sports
           </p>
-          <h1 className="animate-fade-up mt-4 max-w-4xl font-display text-6xl font-bold leading-[1.05] text-gold sm:text-6xl lg:text-7xl [animation-delay:80ms]">
+          <h1 className="animate-fade-up relative mt-5 max-w-3xl font-display text-5xl font-bold leading-[1.05] sm:text-6xl [animation-delay:80ms]">
             Tonight is yours to book.
           </h1>
-          <p className="animate-fade-up mt-6 max-w-2xl text-lg leading-relaxed text-cream-dim [animation-delay:160ms]">
-            Concerts, theatre, festivals and conferences. Pick your seats, confirm in one step and keep your booking
-            code for the door.
+          <p className="animate-fade-up relative mt-5 max-w-2xl text-lg leading-relaxed text-cream/85 [animation-delay:160ms]">
+            Pick a date, choose a ticket and pay by card or QR. Your ticket is saved in your profile.
           </p>
 
-          <div className="animate-fade-up mt-10 flex flex-col gap-5 [animation-delay:240ms]">
+          <div className="animate-fade-up relative mt-8 flex flex-col gap-5 [animation-delay:240ms]">
             <div className="relative max-w-xl">
-              <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-cream/50" aria-hidden="true" />
+              <Search className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-wine-900/50" aria-hidden="true" />
               <input
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by event, venue or city"
                 aria-label="Search events"
-                className="w-full rounded-full border border-gold/35 bg-cream/10 py-4 pl-13 pr-5 pl-14 text-cream placeholder:text-cream/50 transition focus:border-gold focus:outline-none focus:ring-4 focus:ring-gold/15"
+                className="w-full rounded-full bg-cream py-4 pl-14 pr-5 text-wine-900 shadow-lg placeholder:text-wine-900/45 transition focus:outline-none focus:ring-4 focus:ring-cream/40"
               />
             </div>
 
@@ -116,10 +117,8 @@ export default function EventCatalog() {
                     type="button"
                     aria-pressed={isActive}
                     onClick={() => setCategory(item)}
-                    className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-                      isActive
-                        ? 'bg-crimson text-cream shadow-sm'
-                        : 'text-cream-dim ring-1 ring-gold/35 hover:text-cream hover:ring-gold'
+                    className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
+                      isActive ? 'bg-cream text-crimson shadow-sm' : 'bg-cream/15 text-cream hover:bg-cream/25'
                     }`}
                   >
                     {item}

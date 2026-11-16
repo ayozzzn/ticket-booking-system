@@ -4,6 +4,7 @@
 - Only sample data, so the calendar is not empty on a new database. Fixed IDs, safe to run twice.
 - The events and venues are made up for the demo. Delete or edit them in the admin panel (Calendar or Events tab).
 - Times are Almaty time (+05:00). Prices are USD cents like every other price in the project.
+- Ticket IDs 9501+ replace IDs that clashed with the first sample data (those tickets were skipped). Run this file again to add them.
 - Real events are added in the admin panel: Admin > Calendar > pick a day > "Add event on this date".
 */
 
@@ -29,8 +30,8 @@ INSERT INTO events (id, title, description, category, venue, city, starts_at) VA
 ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO ticket_tiers (id, event_id, name, description, price_cents, capacity, sold) VALUES
-('10000000-0000-4000-8000-000000000501', '20000000-0000-4000-8000-000000000101', 'Standard', 'Any seat', 600, 150, 0),
-('10000000-0000-4000-8000-000000000502', '20000000-0000-4000-8000-000000000102', 'Standard', 'Seated', 3500, 400, 0),
+('10000000-0000-4000-8000-000000009501', '20000000-0000-4000-8000-000000000101', 'Standard', 'Any seat', 600, 150, 0),
+('10000000-0000-4000-8000-000000009502', '20000000-0000-4000-8000-000000000102', 'Standard', 'Seated', 3500, 400, 0),
 ('10000000-0000-4000-8000-000000000503', '20000000-0000-4000-8000-000000000102', 'Fan Zone', 'Standing, close to the stage', 6000, 150, 0),
 ('10000000-0000-4000-8000-000000000504', '20000000-0000-4000-8000-000000000103', 'Standard', 'Upper tier', 1500, 500, 0),
 ('10000000-0000-4000-8000-000000000505', '20000000-0000-4000-8000-000000000103', 'Premium', 'Lower tier, centre', 4000, 120, 0),

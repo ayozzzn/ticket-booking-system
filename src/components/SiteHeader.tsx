@@ -1,5 +1,6 @@
 import { Ticket } from 'lucide-react';
 import type { Route } from '@/hooks/useRoute';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useSession } from '@/hooks/useSession';
 import { supabase } from '@/lib/supabase';
 
@@ -9,11 +10,7 @@ interface SiteHeaderProps {
 
 type NavItem = { label: string; href: string; route: Route['name']; highlight?: boolean };
 
-const BASE_ITEMS: NavItem[] = [
-  { label: 'Events', href: '#/', route: 'home' },
-  { label: 'Find my booking', href: '#/bookings', route: 'bookings' },
-  { label: 'Admin', href: '#/admin', route: 'admin' },
-];
+const BASE_ITEMS: NavItem[] = [{ label: 'Events', href: '#/', route: 'home' }];
 
 const GUEST_ITEMS: NavItem[] = [
   { label: 'Log in', href: '#/login', route: 'login' },
@@ -21,10 +18,13 @@ const GUEST_ITEMS: NavItem[] = [
 ];
 
 const USER_ITEMS: NavItem[] = [{ label: 'My profile', href: '#/profile', route: 'profile' }];
+// Shown only to accounts with admin rights. They log in like everyone else.
+const ADMIN_ITEMS: NavItem[] = [{ label: 'Admin', href: '#/admin', route: 'admin' }];
 
 export default function SiteHeader({ activeRoute }: SiteHeaderProps) {
   const { session } = useSession();
-  const items = [...BASE_ITEMS, ...(session ? USER_ITEMS : GUEST_ITEMS)];
+  const isAdmin = useIsAdmin();
+  const items = [...BASE_ITEMS, ...(session ? USER_ITEMS : GUEST_ITEMS), ...(session && isAdmin ? ADMIN_ITEMS : [])];
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -38,7 +38,7 @@ export default function SiteHeader({ activeRoute }: SiteHeaderProps) {
           <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-crimson text-cream ring-1 ring-cream/25 transition group-hover:bg-crimson-bright">
             <Ticket className="h-5 w-5" aria-hidden="true" />
           </span>
-          <span className="font-display text-3xl font-bold tracking-wide text-cream">Kesh</span>
+          <span className="font-display text-3xl font-bold text-cream">Kesh</span>
         </a>
 
         <nav className="flex items-center gap-1 sm:gap-2" aria-label="Main">
