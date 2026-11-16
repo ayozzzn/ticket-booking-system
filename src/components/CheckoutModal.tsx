@@ -1,10 +1,11 @@
-import { AlertCircle, Loader2, Minus, Plus, X } from 'lucide-react';
+import { AlertCircle, Clock, Loader2, Minus, Plus, X } from 'lucide-react';
 import { useEffect, useState, type FormEvent } from 'react';
-import BookingReceiptCard from '@/components/BookingReceiptCard';
 import FormField from '@/components/FormField';
+import PaymentModal from '@/components/payment/PaymentModal';
+import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { useSession } from '@/hooks/useSession';
 import { createBooking } from '@/lib/bookingApi';
-import { formatPrice, ticketsRemaining } from '@/lib/format';
+import { formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
 import type { BookingReceipt, EventRecord, TicketTier } from '@/types/ticketing';
 
 const MAX_TICKETS_PER_BOOKING = 10;
@@ -19,6 +20,7 @@ interface CheckoutModalProps {
 
 export default function CheckoutModal({ event, tier, onClose, onBooked }: CheckoutModalProps) {
   const { session } = useSession();
+  const rate = useExchangeRate();
   const maxQuantity = Math.min(MAX_TICKETS_PER_BOOKING, ticketsRemaining(tier));
   const [quantity, setQuantity] = useState(1);
   const [name, setName] = useState('');
@@ -68,7 +70,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         customerName: name.trim(),
         customerEmail: email.trim(),
       });
-      setReceipt(result);
+      setReceipt(result); // "pending": the tickets are held, payment comes next
       onBooked();
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Your booking could not be completed.');
@@ -78,6 +80,27 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
   }
 
   const total = tier.price_cents * quantity;
+  const free = tier.price_cents === 0;
+
+  if (receipt) {
+    return (
+      <PaymentModal
+        receipt={receipt}
+        onClose={() => {
+          onBooked();
+          onClose();
+        }}
+        onPaid={(paid) => {
+          setReceipt(paid);
+          onBooked();
+        }}
+        onExpired={() => {
+          onBooked();
+          onClose();
+        }}
+      />
+    );
+  }
 
   return (
     <div
@@ -96,8 +119,8 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-crimson">{event.title}</p>
-            <h2 id="checkout-title" className="mt-1 font-display text-3xl font-semibold text-wine-900">
-              {receipt ? 'Booking confirmed' : `${tier.name} tickets`}
+            <h2 id="checkout-title" className="mt-1 font-display text-3xl font-bold text-wine-900">
+              {`${tier.name} tickets`}
             </h2>
           </div>
           <button
@@ -111,33 +134,12 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
           </button>
         </div>
 
-        {receipt ? (
-          <div className="mt-6 space-y-6">
-            <BookingReceiptCard receipt={receipt} />
-            {session && (
-              <p className="text-sm text-wine-900/75">
-                This booking is saved in your{' '}
-                <a href="#/profile" onClick={onClose} className="font-medium text-crimson underline">
-                  profile
-                </a>
-                , where you can also cancel it.
-              </p>
-            )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full rounded-full bg-crimson py-3.5 font-semibold text-cream transition hover:bg-crimson-bright"
-            >
-              Done
-            </button>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
+        <form onSubmit={handleSubmit} className="mt-6 space-y-6" noValidate>
             <div className="flex items-center justify-between rounded-2xl bg-white/60 p-4 ring-1 ring-wine-900/15">
               <div>
                 <p className="font-medium text-wine-900">Number of tickets</p>
                 <p className="text-sm text-wine-900/70">
-                  {formatPrice(tier.price_cents)} each · up to {maxQuantity} available
+                  {free ? 'Free' : formatPrice(tier.price_cents)} each · up to {maxQuantity} available
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -187,7 +189,7 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
             <p className="-mt-3 text-sm text-wine-900/65">
               {session
                 ? 'You are logged in: this booking will appear in your profile.'
-                : 'Your booking code will be sent to this address.'}
+                : 'Use the same email later to find or cancel your booking.'}
             </p>
 
             {formError && (
@@ -197,9 +199,22 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
               </div>
             )}
 
-            <div className="flex items-center justify-between border-t-2 border-dashed border-crimson/35 pt-5">
-              <span className="text-wine-900/70">Total</span>
-              <span className="font-display text-4xl font-semibold text-wine-900">{formatPrice(total)}</span>
+            <div className="border-t-2 border-dashed border-crimson/35 pt-5">
+              <div className="flex items-end justify-between gap-4">
+                <span className="pb-1 text-wine-900/70">Total</span>
+                <div className="text-right">
+                  <span className="block font-display text-4xl font-bold text-wine-900">
+                    {free ? 'Free' : rate ? formatKzt(centsToKzt(total, rate)) : formatPrice(total)}
+                  </span>
+                  {!free && rate && <span className="text-xs text-wine-900/55">{formatPrice(total)} at 1 $ = {rate} ₸</span>}
+                </div>
+              </div>
+              {!free && (
+                <p className="mt-3 flex items-start gap-2 rounded-xl bg-wine-900/5 p-3 text-xs text-wine-900/70">
+                  <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                  Next you pay by card, Kaspi QR or Halyk QR. We hold your tickets for 10 minutes while you pay.
+                </p>
+              )}
             </div>
 
             <button
@@ -208,10 +223,9 @@ export default function CheckoutModal({ event, tier, onClose, onBooked }: Checko
               className="flex w-full items-center justify-center gap-2 rounded-full bg-crimson py-3.5 font-semibold text-cream shadow-sm transition hover:bg-crimson-bright hover:shadow-md disabled:cursor-wait disabled:opacity-70"
             >
               {submitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-              {submitting ? 'Confirming...' : 'Confirm booking'}
+              {submitting ? 'Reserving your tickets...' : free ? 'Confirm free booking' : 'Continue to payment'}
             </button>
-          </form>
-        )}
+        </form>
       </div>
     </div>
   );

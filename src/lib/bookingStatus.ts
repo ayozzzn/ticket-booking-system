@@ -15,6 +15,10 @@ export function getCancelEligibility(
   if (isCancelled(booking)) {
     return { allowed: false, reason: 'This booking is already cancelled.' };
   }
+  if (booking.status === 'expired') {
+    return { allowed: false, reason: 'This reservation expired because it was not paid in time.' };
+  }
+  if (booking.status === 'pending') return { allowed: true }; // giving up an unpaid reservation is always possible
   if (new Date(booking.event_starts_at).getTime() <= now.getTime()) {
     return {
       allowed: false,
@@ -35,4 +39,46 @@ export function timeUntil(iso: string, now: Date = new Date()): string {
   if (days >= 1) return `${days} day${days === 1 ? '' : 's'}${hours ? ` ${hours} h` : ''}`;
   if (hours >= 1) return `${hours} h ${minutes} min`;
   return `${Math.max(minutes, 1)} min`;
+}
+
+// ---- payments -----------------------------------------------------------------------------
+
+/** The tickets are held but not paid yet. */
+export function isPending(booking: Pick<BookingReceipt, 'status' | 'hold_expires_at'>, now: Date = new Date()): boolean {
+  if (booking.status !== 'pending') return false;
+  return !booking.hold_expires_at || new Date(booking.hold_expires_at).getTime() > now.getTime();
+}
+
+/** Unpaid and out of time (the server releases the tickets within a minute, the screen should not wait for that). */
+export function isExpired(booking: Pick<BookingReceipt, 'status' | 'hold_expires_at'>, now: Date = new Date()): boolean {
+  if (booking.status === 'expired') return true;
+  return booking.status === 'pending' && !!booking.hold_expires_at && new Date(booking.hold_expires_at).getTime() <= now.getTime();
+}
+
+/** Money was paid for this booking and it is still valid. */
+export function isPaidConfirmed(booking: Pick<BookingReceipt, 'status' | 'payment'>): boolean {
+  return (booking.status === 'confirmed' || booking.status === null) && booking.payment?.status === 'paid';
+}
+
+export const METHOD_LABEL = {
+  card: 'Bank card',
+  kaspi_qr: 'Kaspi QR',
+  halyk_qr: 'Halyk QR',
+} as const;
+
+export function describePayment(payment: NonNullable<BookingReceipt['payment']>): string {
+  if (payment.method === 'card') {
+    const brand = payment.card_brand === 'visa' ? 'Visa' : payment.card_brand === 'mastercard' ? 'Mastercard' : 'Card';
+    return payment.card_last4 ? `${brand} •••• ${payment.card_last4}` : brand;
+  }
+  return METHOD_LABEL[payment.method];
+}
+
+/** The status the screen should show: a pending booking whose timer ran out is shown as expired at once. */
+export function effectiveStatus(
+  booking: Pick<BookingReceipt, 'status' | 'hold_expires_at'>,
+  now: Date = new Date(),
+): 'pending' | 'confirmed' | 'cancelled' | 'expired' {
+  if (isExpired(booking, now)) return 'expired';
+  return booking.status ?? 'confirmed';
 }

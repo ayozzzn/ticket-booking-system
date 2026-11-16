@@ -37,7 +37,7 @@ export default function EventCard({ event }: EventCardProps) {
           <CalendarDays className="h-4 w-4" aria-hidden="true" />
           {formatEventDate(event.starts_at)} · {formatEventTime(event.starts_at)}
         </p>
-        <h3 className="font-display text-3xl font-semibold leading-[1.05] text-wine-900">{event.title}</h3>
+        <h3 className="font-display text-3xl font-bold leading-[1.05] text-wine-900">{event.title}</h3>
         <p className="flex items-center gap-2 text-sm text-wine-900/70">
           <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="truncate">
@@ -50,7 +50,7 @@ export default function EventCard({ event }: EventCardProps) {
       <div className="relative mt-auto flex items-center justify-between gap-3 border-t-2 border-dashed border-crimson/35 px-5 py-4 before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950">
         <div>
           <p className="text-xs text-wine-900/60">From</p>
-          <p className="font-display text-2xl font-semibold text-wine-900">
+          <p className="font-display text-2xl font-bold text-wine-900">
             {startingPrice !== null ? formatPrice(startingPrice) : 'TBA'}
           </p>
         </div>
