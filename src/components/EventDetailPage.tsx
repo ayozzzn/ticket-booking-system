@@ -2,9 +2,11 @@ import { AlertCircle, ArrowLeft, CalendarDays, Loader2, MapPin } from 'lucide-re
 import { useCallback, useEffect, useState } from 'react';
 import CheckoutModal from '@/components/CheckoutModal';
 import EventImage from '@/components/EventImage';
+import TrailerPlayer from '@/components/TrailerPlayer';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { fetchEvent } from '@/lib/bookingApi';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
+import { getYouTubeId } from '@/lib/trailer';
 import type { EventRecord, TicketTier } from '@/types/ticketing';
 
 interface EventDetailPageProps {
@@ -104,6 +106,17 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
               <p className="mt-6 text-base leading-relaxed text-cream-dim">{event.description}</p>
             </div>
           </div>
+
+          {getYouTubeId(event.trailer_url) && (
+            <section className="mt-16" aria-labelledby="trailer-heading">
+              <h2 id="trailer-heading" className="font-display text-4xl font-bold text-gold">
+                Watch the trailer
+              </h2>
+              <div className="mt-6 max-w-3xl">
+                <TrailerPlayer url={event.trailer_url} title={event.title} />
+              </div>
+            </section>
+          )}
 
           <section className="mt-16" aria-labelledby="tickets-heading">
             <h2 id="tickets-heading" className="font-display text-4xl font-bold text-gold">

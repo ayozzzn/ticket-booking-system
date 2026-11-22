@@ -27,6 +27,8 @@ export interface EventRecord {
   city: string;
   starts_at: string;
   image_url: string | null;
+  /** YouTube link of the trailer (movies). Missing or null = no trailer. */
+  trailer_url?: string | null;
   ticket_tiers: TicketTier[];
 }
 

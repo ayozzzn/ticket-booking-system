@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, MapPin } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, MapPin, Play } from 'lucide-react';
 import EventImage from '@/components/EventImage';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
@@ -32,6 +32,12 @@ export default function EventCard({ event }: EventCardProps) {
         <span className="absolute left-4 top-4 rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson shadow-sm">
           {event.category}
         </span>
+        {event.trailer_url && (
+          <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-wine-950/80 px-3 py-1 text-xs font-semibold text-cream shadow-sm">
+            <Play className="h-3 w-3" fill="currentColor" aria-hidden="true" />
+            Trailer
+          </span>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-5">

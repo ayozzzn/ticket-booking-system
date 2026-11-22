@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase';
 export interface AdminEvent {
   id: string; title: string; description: string; category: string;
   venue: string; city: string; starts_at: string; image_url: string | null;
+  trailer_url?: string | null;
   ticket_tiers?: { id: string; name: string; price_cents: number; capacity: number; sold: number }[];
 }
 export interface AdminBooking {
