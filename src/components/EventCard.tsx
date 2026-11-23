@@ -1,5 +1,4 @@
 import { ArrowUpRight, CalendarDays, MapPin, Play } from 'lucide-react';
-import EventImage from '@/components/EventImage';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
 import type { EventRecord } from '@/types/ticketing';
@@ -28,7 +27,11 @@ export default function EventCard({ event }: EventCardProps) {
       className="group flex flex-col overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-crimson/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        <EventImage src={event.image_url} alt={event.title} className="group-hover:scale-105" />
+        <img 
+          src={event.image_url || ''} 
+          alt={event.title} 
+          className="h-full w-full object-cover group-hover:scale-105 transition duration-500" 
+        />
         <span className="absolute left-4 top-4 rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson shadow-sm">
           {event.category}
         </span>
