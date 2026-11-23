@@ -1,8 +1,9 @@
-import { AlertCircle, ArrowLeft, CalendarDays, Clock3, Crown, Loader2, MapPin } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CalendarDays, Clock3, Crown, Loader2, MapPin, Star } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import CheckoutModal from '@/components/CheckoutModal';
 import EventImage from '@/components/EventImage';
 import ShowtimesSection from '@/components/ShowtimesSection';
+import EventReviews from '@/components/reviews/EventReviews';
 import TrailerPlayer from '@/components/TrailerPlayer';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { fetchEvent } from '@/lib/bookingApi';
@@ -20,6 +21,9 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
   const [status, setStatus] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading');
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedTier, setSelectedTier] = useState<TicketTier | null>(null);
+  // Live ★ average for the header; starts from the event row and follows new reviews.
+  const [rating, setRating] = useState<{ avg: number | null; count: number } | null>(null);
+  const onReviewSummary = useCallback((avg: number | null, count: number) => setRating({ avg, count }), []);
   const rate = useExchangeRate();
 
   const load = useCallback(async () => {
@@ -97,6 +101,20 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                 <span className="w-fit rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson">
                   {event.category}
                 </span>
+                {(() => {
+                  const count = rating?.count ?? event.rating_count ?? 0;
+                  const avg = rating ? rating.avg : event.rating_avg != null ? Number(event.rating_avg) : null;
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => document.getElementById('reviews')?.scrollIntoView({ behavior: 'smooth' })}
+                      className="flex items-center gap-1.5 rounded-full bg-cream/10 px-3 py-1 text-xs font-semibold text-cream transition hover:bg-cream/20"
+                    >
+                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
+                      {count > 0 && avg !== null ? `${avg.toFixed(1)} · ${count} ${count === 1 ? 'review' : 'reviews'}` : 'Rate it'}
+                    </button>
+                  );
+                })()}
                 {event.age_rating && (
                   <span className="rounded-full bg-crimson px-3 py-1 text-xs font-bold text-cream">{event.age_rating}</span>
                 )}
@@ -224,6 +242,8 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
             </ul>
           </section>
           )}
+
+          <EventReviews eventId={event.id} eventTitle={event.title} onSummaryChange={onReviewSummary} />
 
           {selectedTier && (
             <CheckoutModal

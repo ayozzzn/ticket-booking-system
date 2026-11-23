@@ -144,6 +144,57 @@ app.post('/api/bookings/fares', limited, asyncRoute(async (req, res) => {
   if (error) return sendError(res, error);
   res.status(201).json(data);
 }));
+// Event reviews (stars, mood emoji, reactions). Reading is public; writing needs a login.
+// Not the same as /api/feedback, which is feedback about the website.
+const REVIEW_MOODS = ['😍', '🤩', '😂', '😱', '😢', '😴'];
+const REVIEW_REACTIONS = ['👍', '❤️', '😂', '🔥'];
+async function requireUser(req, res) {
+  const token = bearer(req);
+  if (!token) { res.status(401).json({ error: 'Please log in first.' }); return null; }
+  const { data, error } = await db.auth.getUser(token);
+  if (error || !data?.user) { res.status(401).json({ error: 'Invalid session' }); return null; }
+  return token;
+}
+app.get('/api/events/:id/reviews', asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid event ID' });
+  const token = bearer(req);
+  const { data, error } = await clientFor(token).rpc('get_event_reviews', { p_event_id: req.params.id });
+  if (error) return sendError(res, error);
+  res.json(data);
+}));
+app.put('/api/events/:id/reviews', limited, asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid event ID' });
+  const token = await requireUser(req, res);
+  if (!token) return;
+  const { rating, mood, comment } = req.body ?? {};
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5 || (mood != null && !REVIEW_MOODS.includes(mood))
+      || (comment != null && (typeof comment !== 'string' || comment.length > 1000))) {
+    return res.status(400).json({ error: 'Please choose 1–5 stars and write up to 1000 characters.' });
+  }
+  const { data, error } = await clientFor(token).rpc('save_event_review', {
+    p_event_id: req.params.id, p_rating: rating, p_mood: mood ?? null, p_comment: comment ?? '',
+  });
+  if (error) return sendError(res, error);
+  res.json(data);
+}));
+app.delete('/api/reviews/:id', limited, asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid review ID' });
+  const token = await requireUser(req, res);
+  if (!token) return;
+  const { error } = await clientFor(token).rpc('delete_event_review', { p_review_id: req.params.id });
+  if (error) return sendError(res, error);
+  res.json({ deleted: true });
+}));
+app.post('/api/reviews/:id/reactions', limited, asyncRoute(async (req, res) => {
+  if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid review ID' });
+  const token = await requireUser(req, res);
+  if (!token) return;
+  const { emoji } = req.body ?? {};
+  if (!REVIEW_REACTIONS.includes(emoji)) return res.status(400).json({ error: 'Unknown reaction' });
+  const { data, error } = await clientFor(token).rpc('toggle_review_reaction', { p_review_id: req.params.id, p_emoji: emoji });
+  if (error) return sendError(res, error);
+  res.json(data);
+}));
 app.post('/api/bookings/lookup', limited, asyncRoute(async (req, res) => {
   const { code, email } = req.body ?? {};
   if (!isText(code, 60) || !emailOk(email)) return res.status(400).json({ error: 'Invalid lookup input' });

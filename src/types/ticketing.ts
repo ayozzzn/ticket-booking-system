@@ -66,6 +66,9 @@ export interface EventRecord {
   /** Movies: age rating like "12+" and running time. */
   age_rating?: string | null;
   duration_minutes?: number | null;
+  /** Average of the reviews (1-5) and how many there are. Kept up to date by the database. */
+  rating_avg?: number | string | null;
+  rating_count?: number;
   ticket_tiers: TicketTier[];
 }
 
@@ -120,4 +123,32 @@ export interface BookingReceipt {
   format?: string | null;
   cinema_address?: string | null;
   event_id?: string;
+}
+export type ReviewMood = '😍' | '🤩' | '😂' | '😱' | '😢' | '😴';
+export type ReviewReaction = '👍' | '❤️' | '😂' | '🔥';
+
+export interface EventReview {
+  id: string;
+  rating: number;
+  mood: ReviewMood | null;
+  comment: string;
+  display_name: string;
+  created_at: string;
+  edited: boolean;
+  mine: boolean;
+  /** The author has a paid ticket for this event. */
+  verified: boolean;
+  reactions: Partial<Record<ReviewReaction, number>>;
+  my_reactions: ReviewReaction[];
+}
+
+export interface EventReviewsData {
+  summary: {
+    count: number;
+    average: number | null;
+    distribution: Record<'1' | '2' | '3' | '4' | '5', number>;
+    moods: Partial<Record<ReviewMood, number>>;
+  };
+  reviews: EventReview[];
+  can_moderate: boolean;
 }

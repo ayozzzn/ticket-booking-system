@@ -1,4 +1,4 @@
-import { ArrowUpRight, CalendarDays, MapPin, Play } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, MapPin, Play, Star } from 'lucide-react';
 import EventImage from '@/components/EventImage';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
@@ -48,6 +48,13 @@ export default function EventCard({ event }: EventCardProps) {
         <span className="absolute left-4 top-4 rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson shadow-sm">
           {event.category}
         </span>
+        {(event.rating_count ?? 0) > 0 && event.rating_avg != null && (
+          <span className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-wine-950/80 px-2.5 py-1 text-xs font-bold text-cream shadow-sm backdrop-blur">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
+            {Number(event.rating_avg).toFixed(1)}
+            <span className="font-medium text-cream/70">({event.rating_count})</span>
+          </span>
+        )}
         {event.age_rating && (
           <span className="absolute bottom-4 right-4 rounded-full bg-crimson px-2.5 py-1 text-xs font-bold text-cream shadow-sm">
             {event.age_rating}
