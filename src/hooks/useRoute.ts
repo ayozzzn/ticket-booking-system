@@ -7,7 +7,8 @@ export type Route =
   | { name: 'admin' }
   | { name: 'register' }
   | { name: 'login' }
-  | { name: 'profile' };
+  | { name: 'profile' }
+  | { name: 'feedback' };
 
 function parseHash(hash: string): Route {
   // Anything that is not "#/something" (e.g. Supabase's "#access_token=..." after
@@ -22,6 +23,8 @@ function parseHash(hash: string): Route {
       return parts[1] ? { name: 'event', id: parts[1] } : { name: 'home' };
     case 'calendar':
       return { name: 'home' }; // the calendar lives on the home page now
+    case 'feedback':
+      return { name: 'feedback' };
     case 'bookings':
       return { name: 'bookings' };
     case 'admin':
