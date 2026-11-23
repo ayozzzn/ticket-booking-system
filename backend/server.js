@@ -26,7 +26,7 @@ const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSessio
 const app = express();
 app.disable('x-powered-by');
 app.use(helmet());
-app.use(cors({ origin: FRONTEND_ORIGIN.split(',').map(s => s.trim()), methods: ['GET', 'POST'] }));
+app.use(cors({ origin: FRONTEND_ORIGIN.split(',').map(s => s.trim()), methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 // rawBody is needed to check the HMAC signature of provider webhooks
 app.use(express.json({ limit: '20kb', verify: (req, _res, buf) => { req.rawBody = buf; } }));
 // The payment screen asks "paid yet?" every 3 seconds, so that one route has its own, larger limit.
