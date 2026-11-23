@@ -266,7 +266,7 @@ export default function AdminSessions({ events, cinemas, onSaved, onError }: Pro
           <div className={section}>
             <div className="grid grid-cols-2 gap-3">
               <label className="text-sm">First day<input type="date" min={today} value={date} onChange={(e) => setDate(e.target.value || today)} className={input} /></label>
-              <Stepper label="Days in a row" value={repeat} onChange={setRepeat} min={1} max={14} />
+              <Stepper label="Days in a row" value={repeat} onChange={setRepeat} min={1} max={30} />
             </div>
             <p className="mt-1.5 text-xs text-stone-500">{repeat === 1 ? longDay(date) : `${shortDay(date)} – ${shortDay(lastDay)}`}</p>
 
