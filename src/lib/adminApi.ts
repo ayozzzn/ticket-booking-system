@@ -10,7 +10,7 @@ export interface AdminEvent {
 export interface AdminFare { id: string; name: string; price_kzt: number; note: string; sort_order: number }
 export interface AdminTier {
   id: string; name: string; description?: string; price_cents: number; capacity: number; sold: number;
-  seating?: string; cinema_id?: string | null; starts_at?: string | null; hall?: string | null;
+  seating?: string; seats_per_row?: number | null; cinema_id?: string | null; starts_at?: string | null; hall?: string | null;
   format?: string | null; language?: string | null; fares?: AdminFare[];
 }
 export interface AdminCinema { id: string; name: string; address: string; city: string; is_active: boolean }
@@ -43,7 +43,7 @@ export async function getAdminSession() {
 export async function adminSignOut() { await supabase.auth.signOut(); }
 
 export async function loadAdminEvents(): Promise<AdminEvent[]> {
-  const { data, error } = await supabase.from('events').select('*, ticket_tiers(id,name,description,price_cents,capacity,sold,seating,cinema_id,starts_at,hall,format,language,fares:tier_fares(id,name,price_kzt,note,sort_order))').order('starts_at');
+  const { data, error } = await supabase.from('events').select('*, ticket_tiers(id,name,description,price_cents,capacity,sold,seating,seats_per_row,cinema_id,starts_at,hall,format,language,fares:tier_fares(id,name,price_kzt,note,sort_order))').order('starts_at');
   if (error) throw error;
   return (data ?? []) as AdminEvent[];
 }
