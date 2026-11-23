@@ -187,6 +187,32 @@ app.post('/api/bookings/my/cancel', limited, asyncRoute(async (req, res) => {
   if (error) return sendError(res, error);
   res.json(await settleRefund(data));
 }));
+// Feedback: published reviews are readable by everyone; posting requires a valid login.
+app.get('/api/feedback', asyncRoute(async (_req, res) => {
+  const { data, error } = await db.from('feedback').select('id,rating,category,comment,display_name,created_at')
+    .order('created_at', { ascending: false }).limit(100);
+  if (error) return sendError(res, error);
+  res.json(data ?? []);
+}));
+app.post('/api/feedback', limited, asyncRoute(async (req, res) => {
+  const token = bearer(req);
+  if (!token) return res.status(401).json({ error: 'Please log in to leave feedback.' });
+  const { data: userData, error: authError } = await db.auth.getUser(token);
+  if (authError || !userData?.user) return res.status(401).json({ error: 'Invalid session' });
+  const { rating, category, comment } = req.body ?? {};
+  const allowed = ['General experience', 'Booking process', 'Website usability', 'Suggestion'];
+  if (!Number.isInteger(rating) || rating < 1 || rating > 5 || !allowed.includes(category) ||
+      typeof comment !== 'string' || comment.trim().length < 10 || comment.length > 1000) {
+    return res.status(400).json({ error: 'Please select 1–5 stars and write 10–1000 characters.' });
+  }
+  const name = (userData.user.user_metadata?.full_name || userData.user.user_metadata?.name || 'Kesh user');
+  const displayName = typeof name === 'string' ? name.trim().slice(0, 80) || 'Kesh user' : 'Kesh user';
+  const { data, error } = await clientFor(token).from('feedback').insert({
+    user_id: userData.user.id, rating, category, comment: comment.trim(), display_name: displayName,
+  }).select('id,rating,category,comment,display_name,created_at').single();
+  if (error) return sendError(res, error);
+  res.status(201).json(data);
+}));
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: 'Server error' });

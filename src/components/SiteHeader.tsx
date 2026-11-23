@@ -10,7 +10,10 @@ interface SiteHeaderProps {
 
 type NavItem = { label: string; href: string; route: Route['name']; highlight?: boolean };
 
-const BASE_ITEMS: NavItem[] = [{ label: 'Events', href: '#/', route: 'home' }];
+const BASE_ITEMS: NavItem[] = [
+  { label: 'Events', href: '#/', route: 'home' },
+  { label: 'Feedback', href: '#/feedback', route: 'feedback' },
+];
 
 const GUEST_ITEMS: NavItem[] = [
   { label: 'Log in', href: '#/login', route: 'login' },
