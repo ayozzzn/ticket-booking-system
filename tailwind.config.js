@@ -33,6 +33,17 @@ export default {
         sans: ['Manrope', 'system-ui', 'sans-serif'],
       },
       keyframes: {
+        // Reviews: emoji that jumps when picked, and a "+1" that floats away.
+        'emoji-pop': {
+          '0%': { transform: 'scale(1)' },
+          '40%': { transform: 'scale(1.45) rotate(-8deg)' },
+          '70%': { transform: 'scale(0.92) rotate(4deg)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        'float-up': {
+          '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+          '100%': { opacity: '0', transform: 'translateY(-26px) scale(1.3)' },
+        },
         'fade-up': {
           '0%': { opacity: '0', transform: 'translateY(12px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
@@ -83,6 +94,8 @@ export default {
         shake: 'shake 0.4s ease-in-out',
         'draw-check': 'draw-check 0.6s ease-out 0.25s forwards',
         'pop-ring': 'pop-ring 0.9s ease-out both',
+        'emoji-pop': 'emoji-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
+        'float-up': 'float-up 0.7s ease-out forwards',
         'slide-in-right': 'slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both',
         'confetti-fall': 'confetti-fall 1.6s ease-in both',
         sheen: 'sheen 3.2s ease-in-out infinite',
