@@ -1,6 +1,8 @@
 import { ArrowUpRight, CalendarDays, MapPin, Play } from 'lucide-react';
+import EventImage from '@/components/EventImage';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
+import { hasSessions, minFareKzt, upcomingSessions } from '@/lib/sessions';
 import type { EventRecord } from '@/types/ticketing';
 
 interface EventCardProps {
@@ -9,10 +11,16 @@ interface EventCardProps {
 
 export default function EventCard({ event }: EventCardProps) {
   const rate = useExchangeRate();
-  const remaining = event.ticket_tiers.reduce((sum, tier) => sum + ticketsRemaining(tier), 0);
-  const capacity = event.ticket_tiers.reduce((sum, tier) => sum + tier.capacity, 0);
-  const startingPrice =
-    event.ticket_tiers.length > 0 ? Math.min(...event.ticket_tiers.map((tier) => tier.price_cents)) : null;
+  // Movies: only future sessions count; their prices are per ticket type in tenge.
+  const movie = hasSessions(event);
+  const tiers = movie ? upcomingSessions(event) : event.ticket_tiers;
+  const remaining = tiers.reduce((sum, tier) => sum + ticketsRemaining(tier), 0);
+  const capacity = tiers.reduce((sum, tier) => sum + tier.capacity, 0);
+  const startingPrice = tiers.length > 0 ? Math.min(...tiers.map((tier) => tier.price_cents)) : null;
+  const fareFrom = movie ? tiers.map(minFareKzt).filter((v): v is number => v !== null) : [];
+  const startingKzt = fareFrom.length ? Math.min(...fareFrom) : rate && startingPrice !== null ? centsToKzt(startingPrice, rate) : null;
+  const next = movie ? tiers[0]?.starts_at ?? event.starts_at : event.starts_at;
+  const cinemaCount = new Set(tiers.map((t) => t.cinema_id)).size;
 
   const availability =
     remaining === 0
@@ -27,14 +35,24 @@ export default function EventCard({ event }: EventCardProps) {
       className="group flex flex-col overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40 transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-crimson/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
     >
       <div className="relative aspect-[4/3] overflow-hidden">
-        <img 
-          src={event.image_url || ''} 
-          alt={event.title} 
-          className="h-full w-full object-cover group-hover:scale-105 transition duration-500" 
-        />
+        {event.image_url ? (
+          <img
+            src={event.image_url}
+            alt={event.title}
+            className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
+          />
+        ) : (
+          // No poster yet: the same gradient placeholder as on the event page, instead of a broken image.
+          <EventImage src={null} alt="" />
+        )}
         <span className="absolute left-4 top-4 rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson shadow-sm">
           {event.category}
         </span>
+        {event.age_rating && (
+          <span className="absolute bottom-4 right-4 rounded-full bg-crimson px-2.5 py-1 text-xs font-bold text-cream shadow-sm">
+            {event.age_rating}
+          </span>
+        )}
         {event.trailer_url && (
           <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full bg-wine-950/80 px-3 py-1 text-xs font-semibold text-cream shadow-sm">
             <Play className="h-3 w-3" fill="currentColor" aria-hidden="true" />
@@ -46,13 +64,14 @@ export default function EventCard({ event }: EventCardProps) {
       <div className="flex flex-1 flex-col gap-3 p-5">
         <p className="flex items-center gap-2 text-sm font-medium text-crimson">
           <CalendarDays className="h-4 w-4" aria-hidden="true" />
-          {formatEventDate(event.starts_at)} · {formatEventTime(event.starts_at)}
+          {movie && 'Next: '}
+          {formatEventDate(next)} · {formatEventTime(next)}
         </p>
         <h3 className="font-display text-3xl font-bold leading-[1.05] text-wine-900">{event.title}</h3>
         <p className="flex items-center gap-2 text-sm text-wine-900/70">
           <MapPin className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="truncate">
-            {event.venue}, {event.city}
+            {movie ? `${cinemaCount} ${cinemaCount === 1 ? 'cinema' : 'cinemas'} · ${tiers.length} sessions` : `${event.venue}, ${event.city}`}
           </span>
         </p>
       </div>
@@ -62,7 +81,7 @@ export default function EventCard({ event }: EventCardProps) {
         <div>
           <p className="text-xs text-wine-900/60">From</p>
           <p className="font-display text-2xl font-bold text-wine-900">
-            {startingPrice === null ? 'TBA' : startingPrice === 0 ? 'Free' : rate ? formatKzt(centsToKzt(startingPrice, rate)) : formatPrice(startingPrice)}
+            {startingPrice === null ? 'TBA' : startingKzt === 0 ? 'Free' : startingKzt !== null ? formatKzt(startingKzt) : formatPrice(startingPrice)}
           </p>
         </div>
         <div className="flex items-center gap-2">

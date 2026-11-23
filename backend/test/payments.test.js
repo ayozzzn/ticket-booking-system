@@ -201,3 +201,42 @@ test('payment flows against a real database', needDb, async (t) => {
     assert.equal((await sendParsed({ paymentId: pay.id, status: 'paid', amountKzt: pay.amount_kzt, providerRef: 'p-1' })).status, 200, 'webhook retries are harmless');
   });
 });
+
+test('movie session: mixed ticket types, then card payment', needDb, async (t) => {
+  const db = pgDb();
+  const pass = (req, _res, next) => next();
+  const app = fakeApp();
+  registerPaymentRoutes(app, { db, secret: SECRET, mode: 'sandbox', limited: pass });
+
+  const eventId = psql(`insert into events (title, category, venue, city, starts_at) values ('E2E Movie', 'Cinema', 'Cinemas', 'Almaty', now() - interval '20 days') returning id`).split('\n')[0];
+  const cinemaId = psql(`select id from cinemas order by name limit 1`);
+  const tierId = psql(`insert into ticket_tiers (event_id, name, price_cents, capacity, cinema_id, starts_at, hall, format)
+    values ('${eventId}', 'Hall 1 · 2D', 300, 30, '${cinemaId}', now() + interval '6 days', 'Hall 1', '2D') returning id`).split('\n')[0];
+  const adult = psql(`insert into tier_fares (tier_id, name, price_kzt, sort_order) values ('${tierId}', 'Adult', 2800, 1) returning id`).split('\n')[0];
+  const child = psql(`insert into tier_fares (tier_id, name, price_kzt, sort_order) values ('${tierId}', 'Child', 1600, 2) returning id`).split('\n')[0];
+  t.after(() => {
+    psql(`delete from payments where booking_id in (select id from bookings where event_id = '${eventId}')`);
+    psql(`delete from bookings where event_id = '${eventId}'`);
+    psql(`delete from events where id = '${eventId}'`);
+  });
+
+  const { data: b, error } = await db.rpc('create_fare_booking', {
+    p_tier_id: tierId, p_seat_ids: null,
+    p_fares: [{ fare_id: adult, quantity: 2 }, { fare_id: child, quantity: 1 }],
+    p_customer_name: 'Movie Fan', p_customer_email: 'movie@example.com',
+  });
+  assert.equal(error, null, error?.message);
+  assert.equal(b.status, 'pending');
+  assert.equal(b.total_kzt, 2 * 2800 + 1600);
+  assert.deepEqual(b.fares.map((f) => `${f.quantity}x${f.name}`), ['2xAdult', '1xChild']);
+
+  const owner = { code: b.booking_code, email: 'movie@example.com' };
+  const start = await app.invoke('POST', '/api/payments', { ...owner, method: 'card' });
+  assert.equal(start.status, 201, JSON.stringify(start.body));
+  assert.equal(start.body.payment.amount_kzt, 7200);
+  const paid = await app.invoke('POST', `/api/payments/${start.body.payment.id}/card`, {
+    ...owner, card: { number: '4242424242424242', expMonth: 12, expYear: 2031, cvc: '123', holder: 'MOVIE FAN' },
+  });
+  assert.equal(paid.body.receipt.status, 'confirmed', JSON.stringify(paid.body));
+  assert.equal(paid.body.receipt.hall, 'Hall 1');
+});

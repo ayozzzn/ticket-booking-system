@@ -2,6 +2,7 @@ import { ArrowRight, CalendarDays, MapPin } from 'lucide-react';
 import QrCode from '@/components/payment/QrCode';
 import { describePayment } from '@/lib/bookingStatus';
 import { formatEventDate, formatEventTime, formatKzt } from '@/lib/format';
+import { describeFares, sessionLabel } from '@/lib/sessions';
 import type { BookingReceipt } from '@/types/ticketing';
 
 interface PaymentSuccessProps {
@@ -55,7 +56,8 @@ export default function PaymentSuccess({ receipt, loggedIn, onDone }: PaymentSuc
           <p className="text-[10px] uppercase tracking-[0.25em] text-cream/70">Kesh · admit {receipt.quantity}</p>
           <p className="mt-1 font-display text-2xl font-bold leading-tight">{receipt.event_title}</p>
           <p className="text-sm text-cream/80">
-            {receipt.tier_name}
+            {sessionLabel(receipt)}
+            {describeFares(receipt) && ` · ${describeFares(receipt)}`}
             {receipt.seat_labels && receipt.seat_labels.length > 0 && ` · Seats ${receipt.seat_labels.join(', ')}`}
           </p>
         </div>

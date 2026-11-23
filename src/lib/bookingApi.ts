@@ -62,6 +62,24 @@ export async function createSeatBooking(input: CreateSeatBookingInput): Promise<
   return data;
 }
 
+interface CreateFareBookingInput {
+  tierId: string;
+  /** Seats for a session with a seat map, null otherwise. */
+  seatIds: string[] | null;
+  fares: { fareId: string; quantity: number }[];
+  customerName: string;
+  customerEmail: string;
+}
+
+/** Movie session with ticket types (Adult / Student / Child). Also PENDING until paid. */
+export async function createFareBooking(input: CreateFareBookingInput): Promise<BookingReceipt> {
+  const data = await apiRequest<unknown>('/api/bookings/fares', {
+    method: 'POST', body: JSON.stringify(input),
+  }, 'optional');
+  if (!isBookingReceipt(data)) throw new Error('Invalid booking confirmation from backend.');
+  return data;
+}
+
 export async function fetchBooking(code: string, email: string): Promise<BookingReceipt | null> {
   let data: unknown;
   try {

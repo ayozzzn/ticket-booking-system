@@ -34,7 +34,9 @@ export function fakeApp() {
   return app;
 }
 
-const lit = (v) => Array.isArray(v) ? `'{${v.map((x) => String(x).replace(/[^\w-]/g, '')).join(',')}}'` : (v === null || v === undefined ? 'NULL' : typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`);
+const lit = (v) => (v !== null && typeof v === 'object' && !(Array.isArray(v) && v.every((x) => typeof x === 'string')))
+  ? `'${JSON.stringify(v).replace(/'/g, "''")}'::jsonb`
+  : Array.isArray(v) ? `'{${v.map((x) => String(x).replace(/[^\w-]/g, '')).join(',')}}'` : (v === null || v === undefined ? 'NULL' : typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`);
 
 export function psql(sql) {
   const r = spawnSync('psql', [process.env.PG_TEST_CONN, '-X', '-A', '-t', '-v', 'ON_ERROR_STOP=1', '-c', sql], { encoding: 'utf8' });

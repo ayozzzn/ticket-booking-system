@@ -4,6 +4,7 @@ import DateStrip from '@/components/DateStrip';
 import EventCard from '@/components/EventCard';
 import { fetchEvents } from '@/lib/bookingApi';
 import { dayKey, longDay } from '@/lib/calendar';
+import { eventDays, hasSessions, nextStart, upcomingSessions } from '@/lib/sessions';
 import type { EventRecord } from '@/types/ticketing';
 
 const ALL_CATEGORIES = 'All';
@@ -15,6 +16,9 @@ export default function EventCatalog() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState(ALL_CATEGORIES);
   const [day, setDay] = useState<string | null>(null);
+  // Movies: show only those playing in this cinema; sort the grid by next session or by title.
+  const [cinemaId, setCinemaId] = useState('all');
+  const [sort, setSort] = useState<'time' | 'title'>('time');
   const today = dayKey(new Date());
 
   const load = useCallback(async () => {
@@ -33,11 +37,29 @@ export default function EventCatalog() {
   }, [load]);
 
   // Only events that have not happened yet (by Almaty date) are shown on the home page.
-  const upcoming = useMemo(() => events.filter((event) => dayKey(event.starts_at) >= today), [events, today]);
+  // Movies count as upcoming while they have a future session.
+  const upcoming = useMemo(
+    () =>
+      events.filter((event) =>
+        hasSessions(event) ? upcomingSessions(event).length > 0 : dayKey(event.starts_at) >= today,
+      ),
+    [events, today],
+  );
 
   const categories = useMemo(
     () => [ALL_CATEGORIES, ...Array.from(new Set(upcoming.map((event) => event.category))).sort()],
     [upcoming],
+  );
+
+  // Days an event is on; with a cinema chosen, only the days that cinema shows it.
+  const daysFor = useCallback(
+    (event: EventRecord) =>
+      cinemaId === 'all'
+        ? eventDays(event)
+        : Array.from(
+            new Set(upcomingSessions(event).filter((s) => s.cinema_id === cinemaId).map((s) => dayKey(s.starts_at))),
+          ),
+    [cinemaId],
   );
 
   // Search and category filter, but not the date: the date strip shows dots for these.
@@ -48,22 +70,37 @@ export default function EventCatalog() {
       const matchesQuery =
         needle === '' ||
         [event.title, event.venue, event.city].some((value) => value.toLowerCase().includes(needle));
-      return matchesCategory && matchesQuery;
+      return matchesCategory && matchesQuery && daysFor(event).length > 0;
     });
-  }, [upcoming, query, category]);
+  }, [upcoming, query, category, daysFor]);
+
+  // Cinemas that show at least one movie in the current category (for the cinema filter).
+  const cinemas = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const event of upcoming) {
+      if (category !== ALL_CATEGORIES && event.category !== category) continue;
+      for (const s of upcomingSessions(event)) if (s.cinema) map.set(s.cinema.id, s.cinema.name);
+    }
+    return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  }, [upcoming, category]);
+  const showCinemaFilter = category !== ALL_CATEGORIES && cinemas.length > 0;
 
   const dayCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const event of matching) {
-      const key = dayKey(event.starts_at);
-      map.set(key, (map.get(key) ?? 0) + 1);
+      for (const key of daysFor(event)) map.set(key, (map.get(key) ?? 0) + 1);
     }
     return map;
-  }, [matching]);
+  }, [matching, daysFor]);
 
   const visibleEvents = useMemo(
-    () => (day ? matching.filter((event) => dayKey(event.starts_at) === day) : matching),
-    [matching, day],
+    () => {
+      const list = day ? matching.filter((event) => daysFor(event).includes(day)) : matching;
+      return [...list].sort((a, b) =>
+        sort === 'title' ? a.title.localeCompare(b.title) : nextStart(a).localeCompare(nextStart(b)),
+      );
+    },
+    [matching, day, sort, daysFor],
   );
 
   // On "All" the page is split into one row per category, like a poster wall.
@@ -77,6 +114,7 @@ export default function EventCatalog() {
     setQuery('');
     setCategory(ALL_CATEGORIES);
     setDay(null);
+    setCinemaId('all');
   };
 
   return (
@@ -116,7 +154,7 @@ export default function EventCatalog() {
                     key={item}
                     type="button"
                     aria-pressed={isActive}
-                    onClick={() => setCategory(item)}
+                    onClick={() => { setCategory(item); setCinemaId('all'); }}
                     className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
                       isActive ? 'bg-cream text-crimson shadow-sm' : 'bg-cream/15 text-cream hover:bg-cream/25'
                     }`}
@@ -164,9 +202,39 @@ export default function EventCatalog() {
               <h2 className="font-display text-3xl font-bold text-cream">
                 {day ? longDay(day) : category === ALL_CATEGORIES ? 'All upcoming events' : category}
               </h2>
-              <p className="text-sm text-gold">
-                {visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'}
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                {showCinemaFilter && (
+                  <select
+                    aria-label="Cinema"
+                    value={cinemaId}
+                    onChange={(e) => setCinemaId(e.target.value)}
+                    className="rounded-full bg-cream px-4 py-2 text-sm font-semibold text-wine-900 focus:outline-none focus:ring-2 focus:ring-gold"
+                  >
+                    <option value="all">All cinemas</option>
+                    {cinemas.map(([id, name]) => (
+                      <option key={id} value={id}>{name}</option>
+                    ))}
+                  </select>
+                )}
+                {category !== ALL_CATEGORIES && (
+                  <div className="flex rounded-full bg-wine-950/60 p-1 ring-1 ring-gold/20" role="group" aria-label="Sort">
+                    {(['time', 'title'] as const).map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        aria-pressed={sort === m}
+                        onClick={() => setSort(m)}
+                        className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${sort === m ? 'bg-crimson text-cream' : 'text-cream-dim hover:text-cream'}`}
+                      >
+                        {m === 'time' ? 'Soonest' : 'A–Z'}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <p className="text-sm text-gold">
+                  {visibleEvents.length} {visibleEvents.length === 1 ? 'event' : 'events'}
+                </p>
+              </div>
             </div>
 
             {visibleEvents.length === 0 ? (

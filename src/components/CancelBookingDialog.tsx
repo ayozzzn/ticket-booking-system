@@ -4,6 +4,7 @@ import { cancelBooking } from '@/lib/bookingApi';
 import { describePayment } from '@/lib/bookingStatus';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice } from '@/lib/format';
 import { cancelMyBooking } from '@/lib/myBookingsApi';
+import { describeFares, sessionLabel } from '@/lib/sessions';
 import type { BookingReceipt } from '@/types/ticketing';
 
 interface CancelBookingDialogProps {
@@ -184,7 +185,7 @@ export default function CancelBookingDialog({ receipt: liveReceipt, email, accou
         {[
           ['Event', receipt.event_title],
           ['Date', `${formatEventDate(receipt.event_starts_at)} at ${formatEventTime(receipt.event_starts_at)}`],
-          ['Tickets', `${tickets} · ${receipt.tier_name}`],
+          ['Tickets', `${describeFares(receipt) ?? tickets} · ${sessionLabel(receipt)}`],
           ['Total', receipt.total_kzt ? formatKzt(receipt.total_kzt) : formatPrice(receipt.total_cents)],
           ['Booking code', receipt.booking_code],
         ].map(([label, value]) => (

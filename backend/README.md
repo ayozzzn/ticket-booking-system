@@ -27,6 +27,7 @@ If PowerShell blocks npm scripts, use `npm.cmd install` and `npm.cmd run dev`.
 | GET | `/api/events/:id` | UUID |
 | GET | `/api/tiers/:id/seats` | none (seat map of a reserved-seating ticket type) |
 | POST | `/api/bookings/seats` | `{ "tierId": "UUID", "seatIds": ["UUID"], "customerName": "...", "customerEmail": "..." }` (pending, then pay) |
+| POST | `/api/bookings/fares` | `{ "tierId": "UUID", "seatIds": ["UUID"] or null, "fares": [{ "fareId": "UUID", "quantity": 2 }], "customerName": "...", "customerEmail": "..." }` (movie session with ticket types, pending, then pay) |
 | POST | `/api/bookings` | `{ "tierId": "UUID", "quantity": 1, "customerName": "Test User", "customerEmail": "test@example.com" }` |
 | POST | `/api/bookings/lookup` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
 | POST | `/api/bookings/cancel` | `{ "code": "BOOKING_CODE", "email": "test@example.com" }` |
@@ -43,6 +44,15 @@ If PowerShell blocks npm scripts, use `npm.cmd install` and `npm.cmd run dev`.
    The signed webhook `POST /api/payments/webhook/live` and refund retry already exist.
 5. Flow: booking is `pending` and holds tickets 10 min -> pay -> `confirmed`. Unpaid -> `expired`. Cancelling a paid booking refunds 100% (48h+), 75% (24-48h), 50% (less) by `refund_percent_for()` in SQL.
 6. Tests: `PG_TEST_CONN="host=... dbname=..." PG_TEST_SECRET=... npm test` (needs `psql`; card helper tests run without it).
+
+## Movies: cinemas, sessions, ticket types
+1. Run `supabase/migrations/20261123120000_cinema_sessions.sql` (after the payments and seats migrations), then `supabase/tests/session_checks.sql`.
+2. Optional demo data: `20261123130000_cinema_demo_sessions.sql` adds sessions for the next 7 days to every Cinema event.
+3. Admin > Cinemas: list of Almaty cinemas (add, edit, hide).
+4. Admin > Sessions: pick a movie, a cinema, a day (repeat for N days), times like `11:00, 19:00`, hall, format,
+   seat map and the price of each ticket type in tenge (Adult, Student, Child, add more if needed).
+5. Customers pick a session on the movie page (filter by cinema, time of day, format; sort by cinema or time),
+   choose seats, set the ticket type of each seat and pay. Concert ticket types (VIP, Standard...) work as before.
 
 ## Important: integration and deployment are still separate tasks
 - The existing React frontend **still calls Supabase directly**. Adding this server alone does not make frontend requests use Express. To integrate, change the relevant functions in `src/lib/bookingApi.ts` and `src/lib/myBookingsApi.ts` to use `fetch` against the backend base URL (and pass Supabase access tokens for authenticated routes).

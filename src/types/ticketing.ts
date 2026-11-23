@@ -8,6 +8,40 @@ export interface TicketTier {
   sold: number;
   /** 'reserved' = the customer picks seats on a seat map. Missing = 'general'. */
   seating?: 'general' | 'reserved';
+  /** Movie session: set when this ticket type is one showing in a cinema. */
+  cinema_id?: string | null;
+  cinema?: Cinema | null;
+  /** Session start (movies). Missing = the event's own date and time. */
+  starts_at?: string | null;
+  hall?: string | null;
+  format?: string | null; // 2D, 3D, IMAX...
+  language?: string | null; // RU, KZ, EN...
+  /** Ticket types of a session with tenge prices (Adult, Student, Child). Empty = one price for everyone. */
+  fares?: Fare[];
+}
+
+export interface Cinema {
+  id: string;
+  name: string;
+  address: string;
+  city: string;
+  is_active?: boolean;
+}
+
+export interface Fare {
+  id: string;
+  name: string;
+  price_kzt: number;
+  note: string;
+  sort_order: number;
+}
+
+/** One line of a booking with ticket types, e.g. 2 x Adult. */
+export interface FareLine {
+  fare_id: string;
+  name: string;
+  quantity: number;
+  price_kzt: number;
 }
 
 export interface Seat {
@@ -29,6 +63,9 @@ export interface EventRecord {
   image_url: string | null;
   /** YouTube link of the trailer (movies). Missing or null = no trailer. */
   trailer_url?: string | null;
+  /** Movies: age rating like "12+" and running time. */
+  age_rating?: string | null;
+  duration_minutes?: number | null;
   ticket_tiers: TicketTier[];
 }
 
@@ -77,4 +114,10 @@ export interface BookingReceipt {
   refund_quote?: { percent: number; kzt: number } | null;
   /** Seats of a reserved-seating booking, e.g. ["C7", "C8"]. Empty or missing for general admission. */
   seat_labels?: string[] | null;
+  /** Movie sessions: chosen ticket types, hall and format. */
+  fares?: FareLine[] | null;
+  hall?: string | null;
+  format?: string | null;
+  cinema_address?: string | null;
+  event_id?: string;
 }

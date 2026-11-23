@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import BookingStatusBadge from '@/components/BookingStatusBadge.tsx';
 import { describePayment, effectiveStatus } from '@/lib/bookingStatus';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice } from '@/lib/format';
+import { describeFares, sessionLabel } from '@/lib/sessions';
 import type { BookingReceipt } from '@/types/ticketing';
 
 interface BookingReceiptCardProps {
@@ -25,8 +26,10 @@ export default function BookingReceiptCard({ receipt }: BookingReceiptCardProps)
       value: `${formatEventDate(receipt.event_starts_at)} at ${formatEventTime(receipt.event_starts_at)}`,
     },
     { label: 'Venue', value: `${receipt.event_venue}, ${receipt.event_city}` },
-    { label: 'Ticket type', value: receipt.tier_name },
-    { label: 'Tickets', value: String(receipt.quantity) },
+    ...(receipt.hall || receipt.format
+      ? [{ label: 'Session', value: sessionLabel(receipt) }]
+      : [{ label: 'Ticket type', value: receipt.tier_name }]),
+    { label: 'Tickets', value: describeFares(receipt) ?? String(receipt.quantity) },
     ...(receipt.seat_labels && receipt.seat_labels.length > 0
       ? [{ label: 'Seats', value: receipt.seat_labels.join(', ') }]
       : []),

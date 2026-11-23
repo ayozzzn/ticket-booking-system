@@ -8,6 +8,7 @@ import { effectiveStatus } from '@/lib/bookingStatus';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice } from '@/lib/format';
 import { fetchMyBookings, fetchProfile, updateProfileName } from '@/lib/myBookingsApi';
 import { supabase } from '@/lib/supabase';
+import { describeFares, sessionLabel } from '@/lib/sessions';
 import type { BookingReceipt } from '@/types/ticketing';
 
 type TabId = 'upcoming' | 'past' | 'cancelled';
@@ -308,7 +309,8 @@ export default function ProfilePage() {
               {/* Ticket stub */}
               <div className="relative flex flex-wrap items-center justify-between gap-3 border-t-2 border-dashed border-crimson/35 px-5 py-4 text-sm before:absolute before:-left-3 before:-top-3 before:h-6 before:w-6 before:rounded-full before:bg-wine-950 after:absolute after:-right-3 after:-top-3 after:h-6 after:w-6 after:rounded-full after:bg-wine-950">
                 <p className="text-wine-900/75">
-                  {b.quantity} × {b.tier_name}
+                  {describeFares(b) ?? `${b.quantity} × ${b.tier_name}`}
+                  {(b.hall || b.format) && ` · ${sessionLabel(b)}`}
                   {b.seat_labels && b.seat_labels.length > 0 && ` (seats ${b.seat_labels.join(', ')})`} ·{' '}
                   <span className="font-semibold text-wine-900">{b.total_kzt ? formatKzt(b.total_kzt) : formatPrice(b.total_cents)}</span>
                 </p>

@@ -5,6 +5,7 @@ DO $$
 DECLARE
   v_secret text := (SELECT value FROM payment_settings WHERE key = 'backend_secret');
   v_tier uuid := (SELECT id FROM ticket_tiers t WHERE seating = 'reserved'
+                  AND NOT EXISTS (SELECT 1 FROM tier_fares f WHERE f.tier_id = t.id)
                   AND (SELECT starts_at FROM events e WHERE e.id = t.event_id) > now() + interval '3 days'
                   AND capacity - sold >= 4 LIMIT 1);
   v_seats uuid[];

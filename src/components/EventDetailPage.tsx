@@ -1,11 +1,13 @@
-import { AlertCircle, ArrowLeft, CalendarDays, Loader2, MapPin } from 'lucide-react';
+import { AlertCircle, ArrowLeft, CalendarDays, Clock3, Crown, Loader2, MapPin } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import CheckoutModal from '@/components/CheckoutModal';
 import EventImage from '@/components/EventImage';
+import ShowtimesSection from '@/components/ShowtimesSection';
 import TrailerPlayer from '@/components/TrailerPlayer';
 import { centsToKzt, useExchangeRate } from '@/hooks/useExchangeRate';
 import { fetchEvent } from '@/lib/bookingApi';
 import { formatEventDate, formatEventTime, formatKzt, formatPrice, ticketsRemaining } from '@/lib/format';
+import { formatDuration, hasSessions, isSession, upcomingSessions } from '@/lib/sessions';
 import { getYouTubeId } from '@/lib/trailer';
 import type { EventRecord, TicketTier } from '@/types/ticketing';
 
@@ -38,6 +40,12 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const movie = event ? hasSessions(event) : false;
+  const upcoming = event ? upcomingSessions(event) : [];
+  const cinemaCount = new Set(upcoming.map((s) => s.cinema_id)).size;
+  // Movies: sessions are shown above; any other ticket types stay in the normal list.
+  const plainTiers = event ? event.ticket_tiers.filter((t) => !isSession(t)) : [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -85,23 +93,49 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
             </div>
 
             <div className="flex flex-col justify-center">
-              <span className="w-fit rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson">
-                {event.category}
-              </span>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="w-fit rounded-full bg-cream px-3 py-1 text-xs font-semibold text-crimson">
+                  {event.category}
+                </span>
+                {event.age_rating && (
+                  <span className="rounded-full bg-crimson px-3 py-1 text-xs font-bold text-cream">{event.age_rating}</span>
+                )}
+                {formatDuration(event.duration_minutes) && (
+                  <span className="flex items-center gap-1.5 rounded-full bg-cream/10 px-3 py-1 text-xs font-semibold text-cream">
+                    <Clock3 className="h-3.5 w-3.5" aria-hidden="true" />
+                    {formatDuration(event.duration_minutes)}
+                  </span>
+                )}
+              </div>
               <h1 className="mt-5 font-display text-5xl font-bold leading-[1.08] text-gold sm:text-6xl">
                 {event.title}
               </h1>
 
-              <div className="mt-6 space-y-3 text-cream">
-                <p className="flex items-center gap-3">
-                  <CalendarDays className="h-5 w-5 text-gold" aria-hidden="true" />
-                  {formatEventDate(event.starts_at)} · {formatEventTime(event.starts_at)}
-                </p>
-                <p className="flex items-center gap-3">
-                  <MapPin className="h-5 w-5 text-gold" aria-hidden="true" />
-                  {event.venue}, {event.city}
-                </p>
-              </div>
+              {movie ? (
+                <div className="mt-6 space-y-3 text-cream">
+                  <p className="flex items-center gap-3">
+                    <CalendarDays className="h-5 w-5 text-gold" aria-hidden="true" />
+                    {upcoming.length > 0
+                      ? `${upcoming.length} ${upcoming.length === 1 ? 'session' : 'sessions'} · next ${formatEventDate(upcoming[0].starts_at)}, ${formatEventTime(upcoming[0].starts_at)}`
+                      : 'No upcoming sessions'}
+                  </p>
+                  <p className="flex items-center gap-3">
+                    <MapPin className="h-5 w-5 text-gold" aria-hidden="true" />
+                    {cinemaCount} {cinemaCount === 1 ? 'cinema' : 'cinemas'} in {event.city}
+                  </p>
+                </div>
+              ) : (
+                <div className="mt-6 space-y-3 text-cream">
+                  <p className="flex items-center gap-3">
+                    <CalendarDays className="h-5 w-5 text-gold" aria-hidden="true" />
+                    {formatEventDate(event.starts_at)} · {formatEventTime(event.starts_at)}
+                  </p>
+                  <p className="flex items-center gap-3">
+                    <MapPin className="h-5 w-5 text-gold" aria-hidden="true" />
+                    {event.venue}, {event.city}
+                  </p>
+                </div>
+              )}
 
               <p className="mt-6 text-base leading-relaxed text-cream-dim">{event.description}</p>
             </div>
@@ -118,24 +152,48 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
             </section>
           )}
 
+          {movie && (
+            <section className="mt-16" aria-labelledby="sessions-heading">
+              <h2 id="sessions-heading" className="font-display text-4xl font-bold text-gold">
+                Sessions
+              </h2>
+              <p className="mt-2 text-cream-dim">
+                Pick a day and a time. Adult, student and child tickets are chosen on the next step.
+              </p>
+              <ShowtimesSection event={event} onPick={setSelectedTier} />
+            </section>
+          )}
+
+          {plainTiers.length > 0 && (
           <section className="mt-16" aria-labelledby="tickets-heading">
             <h2 id="tickets-heading" className="font-display text-4xl font-bold text-gold">
-              Choose your tickets
+              {movie ? 'Other tickets' : 'Choose your tickets'}
             </h2>
             <p className="mt-2 text-cream-dim">Select a ticket type to continue to checkout.</p>
 
             <ul className="mt-8 grid gap-6">
-              {event.ticket_tiers.map((tier) => {
+              {plainTiers.map((tier) => {
                 const remaining = ticketsRemaining(tier);
                 const soldOut = remaining === 0;
                 const low = !soldOut && remaining <= 10;
+                const vip = /\b(vip|premium|business)\b/i.test(tier.name);
                 return (
                   <li
                     key={tier.id}
-                    className="overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40"
+                    className={`overflow-hidden rounded-2xl bg-cream text-wine-900 shadow-xl shadow-black/40 ${
+                      vip ? 'ring-2 ring-gold shadow-gold/20' : ''
+                    }`}
                   >
                     <div className="p-5 sm:p-6">
-                      <h3 className="font-display text-2xl font-bold text-crimson">{tier.name}</h3>
+                      <div className="flex flex-wrap items-center gap-3">
+                        <h3 className="font-display text-2xl font-bold text-crimson">{tier.name}</h3>
+                        {vip && (
+                          <span className="flex items-center gap-1 rounded-full bg-gradient-to-r from-gold to-amber-300 px-3 py-1 text-xs font-bold uppercase tracking-wider text-wine-900">
+                            <Crown className="h-3.5 w-3.5" aria-hidden="true" />
+                            VIP
+                          </span>
+                        )}
+                      </div>
                       <p className="mt-1 text-sm text-wine-900/75">{tier.description}</p>
                       <p
                         className={`mt-2 text-sm font-semibold ${
@@ -165,6 +223,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
               })}
             </ul>
           </section>
+          )}
 
           {selectedTier && (
             <CheckoutModal

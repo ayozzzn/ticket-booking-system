@@ -59,14 +59,18 @@ const { settleRefund, startBackgroundJobs } = registerPaymentRoutes(app, {
 });
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'kesh-backend' }));
+// Events with their ticket types. For movies a ticket type with a cinema and time is a session,
+// and its fares are the ticket types of that session (Adult / Student / Child).
+const EVENT_SELECT = '*, ticket_tiers(*, cinema:cinemas(id,name,address,city), fares:tier_fares(id,name,price_kzt,note,sort_order))';
+
 app.get('/api/events', asyncRoute(async (_req, res) => {
-  const { data, error } = await db.from('events').select('*, ticket_tiers(*)').order('starts_at', { ascending: true });
+  const { data, error } = await db.from('events').select(EVENT_SELECT).order('starts_at', { ascending: true });
   if (error) return sendError(res, error);
   res.json(data);
 }));
 app.get('/api/events/:id', asyncRoute(async (req, res) => {
   if (!uuidOk(req.params.id)) return res.status(400).json({ error: 'Invalid event ID' });
-  const { data, error } = await db.from('events').select('*, ticket_tiers(*)').eq('id', req.params.id).maybeSingle();
+  const { data, error } = await db.from('events').select(EVENT_SELECT).eq('id', req.params.id).maybeSingle();
   if (error) return sendError(res, error);
   if (!data) return res.status(404).json({ error: 'Event not found' });
   res.json(data);
@@ -111,6 +115,31 @@ app.post('/api/bookings/seats', limited, asyncRoute(async (req, res) => {
   }
   const { data, error } = await clientFor(token).rpc('create_booking_with_seats', {
     p_tier_id: tierId, p_seat_ids: seatIds, p_customer_name: customerName.trim(), p_customer_email: customerEmail.trim()
+  });
+  if (error) return sendError(res, error);
+  res.status(201).json(data);
+}));
+// Session booking with ticket types, e.g. 2 x Adult + 1 x Child. Pending until paid, like the others.
+app.post('/api/bookings/fares', limited, asyncRoute(async (req, res) => {
+  const { tierId, seatIds, fares, customerName, customerEmail } = req.body ?? {};
+  const seatsOk = seatIds == null || (Array.isArray(seatIds) && seatIds.length <= 10
+    && seatIds.every(uuidOk) && new Set(seatIds).size === seatIds.length);
+  const faresOk = Array.isArray(fares) && fares.length >= 1 && fares.length <= 10
+    && fares.every((f) => f && uuidOk(f.fareId) && Number.isInteger(f.quantity) && f.quantity >= 0 && f.quantity <= 10);
+  if (!uuidOk(tierId) || !seatsOk || !faresOk || !isText(customerName, 120) || !emailOk(customerEmail)) {
+    return res.status(400).json({ error: 'Invalid booking input' });
+  }
+  const token = bearer(req);
+  if (token) {
+    const { data: userData } = await db.auth.getUser(token);
+    if (!userData?.user) return res.status(401).json({ error: 'Invalid session' });
+  }
+  const { data, error } = await clientFor(token).rpc('create_fare_booking', {
+    p_tier_id: tierId,
+    p_seat_ids: seatIds && seatIds.length ? seatIds : null,
+    p_fares: fares.map((f) => ({ fare_id: f.fareId, quantity: f.quantity })),
+    p_customer_name: customerName.trim(),
+    p_customer_email: customerEmail.trim()
   });
   if (error) return sendError(res, error);
   res.status(201).json(data);

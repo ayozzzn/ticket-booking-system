@@ -8,6 +8,7 @@ import { useSession } from '@/hooks/useSession';
 import { cancelBooking } from '@/lib/bookingApi';
 import { formatKzt } from '@/lib/format';
 import { fetchPaymentConfig, startPayment, type PaymentConfig, type PaymentState } from '@/lib/paymentApi';
+import { describeFares, sessionLabel } from '@/lib/sessions';
 import type { BookingReceipt, PaymentMethod } from '@/types/ticketing';
 
 interface PaymentFlowProps {
@@ -140,7 +141,7 @@ export default function PaymentFlow({ receipt: initial, onPaid, onExpired, onDon
           <div className="min-w-0">
             <p className="text-[10px] uppercase tracking-[0.25em] text-cream/60">Order {receipt.booking_code}</p>
             <p className="mt-1 truncate font-medium">{receipt.event_title}</p>
-            <p className="text-sm text-cream/70">{receipt.quantity} × {receipt.tier_name}</p>
+            <p className="text-sm text-cream/70">{describeFares(receipt) ?? `${receipt.quantity} × ${receipt.tier_name}`}</p>
           </div>
           <p className="shrink-0 font-display text-4xl font-bold text-gold">{formatKzt(total)}</p>
         </div>
