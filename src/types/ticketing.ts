@@ -59,6 +59,7 @@ export interface EventRecord {
   category: string;
   venue: string;
   city: string;
+  venue_address?: string | null;
   starts_at: string;
   image_url: string | null;
   /** YouTube link of the trailer (movies). Missing or null = no trailer. */
