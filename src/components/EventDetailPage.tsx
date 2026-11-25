@@ -57,7 +57,7 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-     <a
+      <a
         href="#/"
         className="inline-flex items-center gap-2 text-sm font-medium text-cream-dim transition hover:text-cream"
       >
@@ -185,8 +185,8 @@ export default function EventDetailPage({ eventId }: EventDetailPageProps) {
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 rounded-xl bg-[#28A745] px-4 py-2 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-[#218838]"
                     >
-                      <span className="text-base font-black">2ГИС</span>
-                      Открыть карту
+                      <span className="text-base font-black">2GIS</span>
+                      Open Map
                     </a>
                   </div>
                 </div>
